@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Banco del Tiempo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            surface: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 700: '#334155', 800: '#1e293b', 900: '#0f172a', 950: '#020617' },
+            accent: { 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7' },
+            success: { 400: '#34d399', 500: '#10b981', 600: '#059669' },
+            warn: { 400: '#fbbf24', 500: '#f59e0b' },
+            danger: { 400: '#f87171', 500: '#ef4444', 600: '#dc2626' },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0b0f1a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Subtle background texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(14,165,233,0.06), transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(16,185,129,0.04), transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Card surface */
+    .card {
+      background: rgba(15,23,42,0.65);
+      border: 1px solid rgba(148,163,184,0.1);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+    }
+
+    .card-solid {
+      background: #111827;
+      border: 1px solid rgba(148,163,184,0.08);
+      border-radius: 16px;
+    }
+
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 200ms ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Chat bubbles */
+    .bubble-me {
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      color: #f8fafc;
+      border-radius: 16px 16px 4px 16px;
+    }
+    .bubble-them {
+      background: rgba(30,41,59,0.9);
+      color: #e2e8f0;
+      border-radius: 16px 16px 16px 4px;
+      border: 1px solid rgba(148,163,184,0.1);
+    }
+
+    /* Sidebar nav */
+    .nav-active {
+      background: rgba(14,165,233,0.12);
+      border-color: rgba(14,165,233,0.3) !important;
+      color: #7dd3fc;
+    }
+
+    /* Hero banner */
+    .hero-banner {
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .hero-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(11,15,26,0.15), rgba(11,15,26,0.88));
+      z-index: 0;
+    }
+    .hero-banner > * { position: relative; z-index: 1; }
+
+    /* Hover lift */
+    .lift-card,
+    #searchResults article,
+    #historyList > div,
+    #chatUsersList button,
+    #profileSummary .linkedin-profile-card,
+    #section-services .service-feature {
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    }
+    .lift-card:hover,
+    #searchResults article:hover,
+    #historyList > div:hover,
+    #chatUsersList button:hover,
+    #profileSummary .linkedin-profile-card:hover,
+    #section-services .service-feature:hover {
+      transform: translateY(-1px);
+      border-color: rgba(14,165,233,0.25);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    /* Sidebar */
+    #sidebar {
+      background: rgba(11,15,26,0.97);
+      border-right: 1px solid rgba(148,163,184,0.08);
+    }
+
+    #sidebarMiniProfile {
+      background: rgba(14,165,233,0.06);
+      border: 1px solid rgba(14,165,233,0.12);
+    }
+
+    /* Profile card */
+    #profileSummary .linkedin-profile-card {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(148,163,184,0.1);
+      background: #111827;
+    }
+    #profileSummary .linkedin-cover {
+      min-height: 160px;
+      background-image:
+        linear-gradient(120deg, rgba(14,165,233,0.1), rgba(11,15,26,0.85)),
+        url("https://images.pexels.com/photos/3184325/pexels-photo-3184325.jpeg?auto=compress&cs=tinysrgb&w=1400");
+      background-size: cover;
+      background-position: center;
+    }
+    #profileSummary .linkedin-skill-badge {
+      border: 1px solid rgba(14,165,233,0.2);
+      background: rgba(14,165,233,0.08);
+      color: #bae6fd;
+    }
+
+    /* Service pill */
+    .service-pill {
+      border: 1px solid rgba(14,165,233,0.2);
+      background: rgba(14,165,233,0.08);
+      color: #bae6fd;
+    }
+    .service-action[disabled] {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Credit buy buttons */
+    .credit-buy-btn {
+      border: 1px solid rgba(16,185,129,0.2);
+      background: rgba(16,185,129,0.06);
+      border-radius: 16px;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+    .credit-buy-btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(16,185,129,0.4);
+      box-shadow: 0 8px 24px rgba(6,78,59,0.15);
+    }
+
+    /* Marketplace card */
+    .market-card {
+      background: #111827;
+      border: 1px solid rgba(148,163,184,0.08);
+    }
+
+    /* Rating stars */
+    .rating-stars { display: inline-flex; gap: 2px; font-size: 0.85rem; }
+    .rating-stars .on { color: #fbbf24; }
+    .rating-stars .off { color: rgba(148,163,184,0.4); }
+
+    /* Loader skeleton */
+    .soft-loader {
+      border: 1px solid rgba(148,163,184,0.08);
+      background: rgba(15,23,42,0.5);
+      border-radius: 12px;
+      padding: 12px 16px;
+      animation: softPulse 1.4s ease-in-out infinite;
+    }
+    @keyframes softPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.9; }
+    }
+
+    /* Scrollbar */
+    #messagesContainer::-webkit-scrollbar,
+    #chatUsersList::-webkit-scrollbar,
+    #historyList::-webkit-scrollbar { width: 6px; }
+    #messagesContainer::-webkit-scrollbar-thumb,
+    #chatUsersList::-webkit-scrollbar-thumb,
+    #historyList::-webkit-scrollbar-thumb {
+      background: rgba(148,163,184,0.15);
+      border-radius: 999px;
+    }
+
+    /* Perf: virtualize long lists */
+    #searchResults article,
+    #chatUsersList button,
+    #historyList > div,
+    #messagesContainer > div {
+      content-visibility: auto;
+      contain-intrinsic-size: 160px;
+    }
+
+    /* Image shimmer */
+    img.img-perf {
+      background: linear-gradient(110deg, rgba(51,65,85,0.3) 8%, rgba(71,85,105,0.4) 18%, rgba(51,65,85,0.3) 33%);
+      background-size: 220% 100%;
+      animation: imgShimmer 1.4s linear infinite;
+    }
+    img.img-perf.img-ready {
+      animation: none;
+      background: transparent;
+      transition: opacity 200ms ease;
+      opacity: 1;
+    }
+    @keyframes imgShimmer { to { background-position-x: -220%; } }
+
+    /* Upload preview */
+    .upload-preview {
+      margin-top: 8px;
+      border: 1px dashed rgba(148,163,184,0.2);
+      border-radius: 12px;
+      padding: 8px;
+      background: rgba(15,23,42,0.4);
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .upload-preview img {
+      width: 100%;
+      max-width: 220px;
+      max-height: 130px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,0.15);
+    }
+    .upload-preview span { font-size: 0.75rem; color: #64748b; }
+
+    /* Top header */
+    .top-header-bar {
+      position: sticky;
+      top: 12px;
+      z-index: 25;
+      background: rgba(11,15,26,0.85);
+      border: 1px solid rgba(148,163,184,0.08);
+      backdrop-filter: blur(16px);
+      border-radius: 14px;
+    }
+
+    /* Notification system */
+    .notif-bell-btn {
+      position: relative;
+      border: 1px solid rgba(148,163,184,0.12);
+      background: rgba(15,23,42,0.6);
+      border-radius: 12px;
+      transition: all 160ms ease;
+    }
+    .notif-bell-btn:hover {
+      border-color: rgba(14,165,233,0.3);
+      background: rgba(30,41,59,0.8);
+    }
+    .notif-badge {
+      position: absolute;
+      top: -6px; right: -6px;
+      min-width: 18px; height: 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      background: #ef4444;
+      color: #fff;
+      border: 2px solid rgba(11,15,26,0.95);
+      padding: 0 4px;
+    }
+    .notif-dropdown {
+      position: absolute;
+      right: 0;
+      margin-top: 8px;
+      width: min(92vw, 380px);
+      max-height: 420px;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(148,163,184,0.1);
+      background: rgba(11,15,26,0.98);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+    }
+    .notif-item {
+      border: 1px solid rgba(148,163,184,0.08);
+      background: rgba(15,23,42,0.5);
+      border-radius: 12px;
+      transition: all 160ms ease;
+    }
+    .notif-item:hover {
+      border-color: rgba(14,165,233,0.2);
+      transform: translateY(-1px);
+    }
+    .notif-unread { border-left: 3px solid #0ea5e9; }
+
+    /* Sidebar nav item */
+    .sidebar-nav-item {
+      display: inline-flex;
+      width: 100%;
+      align-items: center;
+      gap: 10px;
+      line-height: 1;
+    }
+    .sidebar-nav-item svg {
+      width: 16px; height: 16px;
+      opacity: 0.8;
+      flex-shrink: 0;
+    }
+
+    /* Chat header bar */
+    #chatHeaderBar {
+      background: linear-gradient(90deg, rgba(11,15,26,0.6), rgba(15,23,42,0.3)),
+        url("https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1200");
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Input base style */
+    .input-base {
+      width: 100%;
+      border-radius: 12px;
+      background: rgba(15,23,42,0.7);
+      border: 1px solid rgba(148,163,184,0.12);
+      padding: 10px 14px;
+      outline: none;
+      color: #e2e8f0;
+      font-size: 0.875rem;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+    .input-base:focus {
+      border-color: rgba(14,165,233,0.5);
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
+    }
+    .input-base::placeholder { color: #475569; }
+
+    /* Button styles */
+    .btn-primary {
+      background: #0ea5e9;
+      color: #fff;
+      font-weight: 500;
+      border-radius: 12px;
+      padding: 10px 20px;
+      border: none;
+      transition: background 160ms ease, transform 80ms ease;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #0284c7; }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-success {
+      background: #059669;
+      color: #fff;
+      font-weight: 500;
+      border-radius: 12px;
+      padding: 10px 20px;
+      border: none;
+      transition: background 160ms ease;
+      cursor: pointer;
+    }
+    .btn-success:hover { background: #047857; }
+
+    .btn-outline {
+      background: transparent;
+      color: #e2e8f0;
+      font-weight: 500;
+      border-radius: 12px;
+      padding: 10px 20px;
+      border: 1px solid rgba(148,163,184,0.2);
+      transition: all 160ms ease;
+      cursor: pointer;
+    }
+    .btn-outline:hover {
+      border-color: rgba(148,163,184,0.35);
+      background: rgba(148,163,184,0.05);
+    }
+
+    .btn-danger {
+      background: rgba(239,68,68,0.15);
+      color: #fca5a5;
+      font-weight: 500;
+      border-radius: 12px;
+      padding: 10px 20px;
+      border: 1px solid rgba(239,68,68,0.2);
+      transition: all 160ms ease;
+      cursor: pointer;
+    }
+    .btn-danger:hover {
+      background: rgba(239,68,68,0.25);
+      border-color: rgba(239,68,68,0.35);
+    }
+
+    /* Google button */
+    .btn-google {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      border-radius: 12px;
+      background: #fff;
+      color: #1f2937;
+      font-weight: 500;
+      padding: 10px 20px;
+      border: none;
+      transition: background 160ms ease, box-shadow 160ms ease;
+      cursor: pointer;
+    }
+    .btn-google:hover {
+      background: #f3f4f6;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Section label */
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    /* Stat card */
+    .stat-card {
+      background: rgba(15,23,42,0.5);
+      border: 1px solid rgba(148,163,184,0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    /* Glass alias */
+    .glass { 
+      background: rgba(15,23,42,0.65);
+      border: 1px solid rgba(148,163,184,0.1);
+      backdrop-filter: blur(12px);
+    }
+
+    /* History card */
+    #historyList .history-enhanced-card {
+      background: #111827;
+      border: 1px solid rgba(148,163,184,0.08);
+    }
+
+    /* Message container bg */
+    #messagesContainer {
+      background:
+        radial-gradient(circle at top right, rgba(14,165,233,0.03), transparent 30%),
+        rgba(2,6,23,0.4);
+    }
+    #chatUsersList button {
+      background: #111827;
+      border: 1px solid rgba(148,163,184,0.06);
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: rgba(148,163,184,0.08);
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body class="antialiased">
+  <!-- Loading overlay -->
+  <div
+    id="loadingOverlay"
+    class="hidden fixed inset-0 z-50 bg-slate-950/30 backdrop-blur-sm pointer-events-none items-center justify-center transition-opacity duration-300"
+  >
+    <div class="card px-6 py-5 flex items-center gap-3 shadow-2xl">
+      <div class="animate-spin rounded-full h-5 w-5 border-2 border-accent-400 border-t-transparent"></div>
+      <span id="loadingText" class="text-sm text-slate-200">Procesando...</span>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed top-4 right-4 z-50 max-w-sm px-4 py-3 rounded-xl shadow-xl text-sm"></div>
+
+  <!-- ==================== AUTH SECTION ==================== -->
+  <section id="authSection" class="min-h-screen flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-4xl grid lg:grid-cols-2 gap-0 items-stretch fade-in overflow-hidden rounded-2xl" style="border: 1px solid rgba(148,163,184,0.08);">
+      <!-- Left: Brand panel -->
+      <div class="relative p-8 lg:p-10 flex flex-col justify-center" style="background: linear-gradient(145deg, #0c1425, #0f1d32);">
+        <!-- SVG Logo -->
+        <div class="mb-6">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-label="Banco del Tiempo">
+            <rect x="4" y="4" width="40" height="40" rx="12" stroke="#0ea5e9" stroke-width="2" fill="none"/>
+            <circle cx="24" cy="22" r="8" stroke="#0ea5e9" stroke-width="1.5" fill="none"/>
+            <path d="M24 18v4l2.5 2.5" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 36h16" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M20 33h8" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="section-label text-accent-400">Banco del Tiempo</p>
+        <h1 class="text-2xl lg:text-3xl font-bold mt-3 leading-tight tracking-tight">Intercambio de habilidades y servicios</h1>
+        <p class="mt-4 text-slate-400 text-sm leading-relaxed">
+          Conecta, ayuda y gana creditos en una comunidad pensada para coordinar apoyo, tiempo y colaboracion.
+          Cada usuario conserva sus datos aislados por UID y cada conversacion se mantiene privada.
+        </p>
+        <div class="mt-8 grid sm:grid-cols-2 gap-3">
+          <div class="stat-card">
+            <p class="text-xs font-semibold text-accent-400">Perfil profesional</p>
+            <p class="text-slate-400 text-xs mt-1.5 leading-relaxed">Habilidades, disponibilidad, foto y reputacion.</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-xs font-semibold text-success-400">Creditos seguros</p>
+            <p class="text-slate-400 text-xs mt-1.5 leading-relaxed">Transferencias validadas con transacciones atomicas.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Auth form -->
+      <div class="p-8 lg:p-10 flex flex-col justify-center" style="background: #111827;">
+        <h2 class="text-xl font-semibold">Acceso</h2>
+        <p class="text-slate-400 mt-1.5 text-sm">Ingresa con email o Google. La sesion queda persistente.</p>
+
+        <form id="authForm" class="mt-6 space-y-4" autocomplete="on">
+          <div>
+            <label for="authEmail" class="text-xs font-medium text-slate-400">Correo</label>
+            <input id="authEmail" type="email" class="input-base mt-1.5" placeholder="correo@ejemplo.com" required />
+          </div>
+          <div>
+            <label for="authPassword" class="text-xs font-medium text-slate-400">Contrasena</label>
+            <input id="authPassword" type="password" class="input-base mt-1.5" placeholder="Minimo 6 caracteres" required />
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-3 pt-1">
+            <button type="button" id="btnLoginEmail" class="btn-primary text-sm">Entrar</button>
+            <button type="button" id="btnRegisterEmail" class="btn-success text-sm">Registrarse</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <button type="button" id="btnLoginGoogle" class="btn-google text-sm">
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Continuar con Google
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== APP SECTION ==================== -->
+  <section id="appSection" class="hidden min-h-screen">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <aside
+        id="sidebar"
+        class="fixed md:static inset-y-0 left-0 z-40 w-72 md:w-[280px] transform -translate-x-full md:translate-x-0 transition duration-200"
+      >
+        <div class="p-5 h-full flex flex-col">
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <svg width="36" height="36" viewBox="0 0 48 48" fill="none" class="flex-shrink-0">
+              <rect x="4" y="4" width="40" height="40" rx="12" stroke="#0ea5e9" stroke-width="2" fill="none"/>
+              <circle cx="24" cy="22" r="8" stroke="#0ea5e9" stroke-width="1.5" fill="none"/>
+              <path d="M24 18v4l2.5 2.5" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 36h16" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M20 33h8" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <div class="min-w-0">
+              <p class="text-xs font-semibold tracking-wide text-accent-400">Banco del Tiempo</p>
+              <p class="text-[11px] text-slate-500 truncate">Intercambio de habilidades</p>
+            </div>
+          </div>
+
+          <!-- Mini profile -->
+          <div id="sidebarMiniProfile" class="mt-5 rounded-xl p-3.5">
+            <div class="flex items-center gap-3">
+              <img
+                id="sidebarMiniAvatar"
+                src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                alt="perfil"
+                loading="lazy"
+                decoding="async"
+                fetchpriority="low"
+                class="w-11 h-11 rounded-xl object-cover border border-slate-700/50"
+              />
+              <div class="min-w-0">
+                <p id="sidebarMiniName" class="text-sm font-semibold truncate">Tu perfil</p>
+                <p class="text-[11px] text-slate-500">Conecta, ayuda y gana</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary card -->
+          <div class="mt-4 card-solid rounded-xl p-3.5">
+            <p class="section-label">Resumen</p>
+            <p id="sidebarEmail" class="text-xs mt-2 text-slate-400 truncate">-</p>
+            <div class="mt-3 grid grid-cols-2 gap-2">
+              <div class="stat-card">
+                <p class="text-[10px] uppercase tracking-wider text-slate-500">Creditos</p>
+                <p id="sidebarCredits" class="text-sm font-semibold text-success-400 mt-0.5">0</p>
+              </div>
+              <div class="stat-card">
+                <p class="text-[10px] uppercase tracking-wider text-slate-500">Rating</p>
+                <p id="sidebarRating" class="text-sm font-semibold text-warn-400 mt-0.5">0.0</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation -->
+          <nav class="mt-5 space-y-1 flex-1 overflow-y-auto">
+            <button data-nav="dashboard" class="nav-btn w-full text-left px-3 py-2 rounded-xl border border-transparent hover:border-slate-700/50 transition text-sm">
+              <span class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg>
+                <span>Mi Perfil</span>
+              </span>
+            </button>
+            <button data-nav="search" class="nav-btn w-full text-left px-3 py-2 rounded-xl border border-transparent hover:border-slate-700/50 transition text-sm">
+              <span class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
+                <span>Buscar Talento</span>
+              </span>
+            </button>
+            <button data-nav="chat" class="nav-btn w-full text-left px-3 py-2 rounded-xl border border-transparent hover:border-slate-700/50 transition text-sm">
+              <span class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H7l-3 3z"/></svg>
+                <span>Chat Privado</span>
+              </span>
+            </button>
+            <button data-nav="buyCredits" class="nav-btn w-full text-left px-3 py-2 rounded-xl border border-transparent hover:border-slate-700/50 transition text-sm">
+              <span class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 10h18"/></svg>
+                <span>Comprar Creditos</span>
+              </span>
+            </button>
+            <button data-nav="marketplace" class="nav-btn w-full text-left px-3 py-2 rounded-xl border border-transparent hover:border-slate-700/50 transition text-sm">
+              <span class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16l-1.4 10H5.4z"/><path d="M9 9V7a3 3 0 016 0v2"/></svg>
+                <span>Marketplace</span>
+              </span>
+            </button>
+            <button data-nav="history" class="nav-btn w-full text-left px-3 py-2 rounded-xl border border-transparent hover:border-slate-700/50 transition text-sm">
+              <span class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 101.8-5.4"/><path d="M3 4v4h4"/><path d="M12 7v5l3 2"/></svg>
+                <span>Historial</span>
+              </span>
+            </button>
+            <button data-nav="notifications" class="nav-btn w-full text-left px-3 py-2 rounded-xl border border-transparent hover:border-slate-700/50 transition text-sm">
+              <span class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16v-5a6 6 0 1112 0v5l2 2H4z"/><path d="M10 20a2 2 0 004 0"/></svg>
+                <span>Notificaciones</span>
+              </span>
+            </button>
+            <button data-nav="services" class="nav-btn w-full text-left px-3 py-2 rounded-xl border border-transparent hover:border-slate-700/50 transition text-sm">
+              <span class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v7H6z"/><path d="M8 10v11"/><path d="M16 10v11"/></svg>
+                <span>Servicios</span>
+              </span>
+            </button>
+          </nav>
+
+          <!-- Logout -->
+          <div class="pt-4">
+            <button id="btnLogout" class="btn-danger w-full text-sm">Cerrar sesion</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Mobile sidebar overlay -->
+      <div id="mobileSidebarOverlay" class="hidden md:hidden fixed inset-0 bg-slate-950/60 z-30"></div>
+
+      <!-- Main content -->
+      <main class="flex-1 md:ml-0 p-4 sm:p-5 lg:p-6">
+        <!-- Mobile top bar -->
+        <div class="md:hidden flex items-center justify-between mb-4">
+          <button id="btnToggleSidebar" class="btn-outline px-3 py-2 text-xs">Menu</button>
+          <p class="text-xs text-slate-400 font-medium">Banco del Tiempo</p>
+        </div>
+
+        <!-- Sticky header -->
+        <div class="top-header-bar px-4 py-3 mb-5">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="section-label">Plataforma profesional</p>
+              <p id="topHeaderSectionTitle" class="mt-1 text-base font-semibold truncate">Panel principal</p>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-3">
+              <!-- Notification bell -->
+              <div class="relative">
+                <button id="btnNotifBell" type="button" class="notif-bell-btn px-2.5 py-2 text-sm" aria-label="Ver notificaciones">
+                  <span class="inline-flex items-center gap-1.5">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16v-5a6 6 0 1112 0v5l2 2H4z"/><path d="M10 20a2 2 0 004 0"/></svg>
+                    <span class="hidden sm:inline text-xs">Alertas</span>
+                  </span>
+                  <span id="notifBadgeCount" class="notif-badge hidden">0</span>
+                </button>
+                <div id="notifDropdown" class="notif-dropdown hidden">
+                  <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between gap-2">
+                    <p class="text-sm font-semibold">Notificaciones</p>
+                    <button id="btnMarkAllNotifsRead" type="button" class="text-[11px] rounded-lg border border-slate-700 hover:border-slate-500 px-2.5 py-1 transition">Marcar leidas</button>
+                  </div>
+                  <div id="notifDropdownList" class="max-h-[320px] overflow-y-auto p-3 space-y-2">
+                    <div class="soft-loader text-xs text-slate-400">Cargando notificaciones...</div>
+                  </div>
+                </div>
+              </div>
+              <!-- User badge -->
+              <div class="rounded-xl border border-slate-800 bg-slate-900/60 px-2.5 py-1.5 flex items-center gap-2 max-w-[200px]">
+                <img id="headerUserAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="usuario" class="w-7 h-7 rounded-full object-cover border border-slate-700" />
+                <div class="min-w-0">
+                  <p id="headerUserName" class="text-xs font-medium truncate">Usuario</p>
+                  <p class="text-[10px] text-slate-500">Online</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== DASHBOARD ===== -->
+        <section id="section-dashboard" class="app-section fade-in">
+          <div
+            class="hero-banner rounded-2xl p-6 sm:p-8 border border-slate-800/40 mb-5"
+            style="background-image:url('https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1400');"
+          >
+            <p class="section-label text-accent-400">Perfil profesional</p>
+            <h2 class="mt-3 text-xl sm:text-2xl font-semibold max-w-2xl leading-tight">Muestra tu perfil, tus habilidades y tu disponibilidad con presencia profesional.</h2>
+            <p class="mt-2 text-sm max-w-2xl text-slate-300/80">
+              Banco del Tiempo reune identidad visual, mensajeria privada y gestion de creditos en una sola interfaz.
+            </p>
+          </div>
+          <div class="grid xl:grid-cols-[1.2fr_1fr] gap-4">
+            <div class="card p-5">
+              <h2 class="text-base font-semibold">Mi Perfil</h2>
+              <p class="text-xs text-slate-500 mt-1">Esta vista solo usa el documento del usuario autenticado.</p>
+              <div id="profileSummary" class="mt-4"></div>
+            </div>
+            <div class="card p-5">
+              <h3 class="text-base font-semibold">Editar Perfil</h3>
+              <form id="profileForm" class="mt-4 space-y-3">
+                <div>
+                  <label for="profileSkill" class="text-xs font-medium text-slate-400">Habilidades</label>
+                  <input id="profileSkill" type="text" maxlength="140" class="input-base mt-1.5" placeholder="Ej: Programacion, diseno, marketing" />
+                </div>
+                <div>
+                  <label for="profileHours" class="text-xs font-medium text-slate-400">Disponibilidad</label>
+                  <input id="profileHours" type="text" maxlength="140" class="input-base mt-1.5" placeholder="Ej: Lunes a Viernes 18:00-21:00" />
+                </div>
+                <div>
+                  <label for="profilePhoto" class="text-xs font-medium text-slate-400">Foto de perfil (Storage)</label>
+                  <input id="profilePhoto" type="file" accept="image/png,image/jpeg,image/webp,image/gif"
+                    class="mt-1.5 w-full text-xs text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-800 file:px-3 file:py-2 file:text-slate-200 hover:file:bg-slate-700 file:text-xs file:cursor-pointer" />
+                  <div id="profileUploadPreview" class="upload-preview">
+                    <span>Selecciona una imagen para previsualizar</span>
+                  </div>
+                </div>
+                <button type="submit" id="btnSaveProfile" class="btn-success w-full text-sm">Guardar cambios</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== SEARCH ===== -->
+        <section id="section-search" class="app-section hidden fade-in">
+          <div class="card p-5">
+            <h2 class="text-base font-semibold">Buscar usuarios por habilidades</h2>
+            <p class="text-xs text-slate-500 mt-1">Contacta perfiles y transfiere creditos de forma segura.</p>
+            <input id="searchSkillInput" type="text" class="input-base mt-4" placeholder="Buscar por habilidad o correo" />
+          </div>
+          <div id="searchResults" class="mt-4 grid lg:grid-cols-2 gap-3"></div>
+        </section>
+
+        <!-- ===== CHAT ===== -->
+        <section id="section-chat" class="app-section hidden fade-in">
+          <div class="grid lg:grid-cols-[300px_1fr] gap-3 h-[calc(100vh-140px)] min-h-[560px]">
+            <div class="card p-4 overflow-hidden">
+              <h2 class="text-sm font-semibold">Contactos</h2>
+              <p class="text-[11px] text-slate-500 mt-0.5">Chats privados 1 a 1, sin mezclar conversaciones.</p>
+              <div id="chatUsersList" class="mt-3 space-y-1.5 overflow-y-auto h-[calc(100%-48px)] pr-1"></div>
+            </div>
+            <div class="card overflow-hidden flex flex-col">
+              <div id="chatHeaderBar" class="px-4 py-3 border-b border-slate-800/60 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <img id="chatHeaderPhoto" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="contacto" loading="lazy" decoding="async" fetchpriority="low" class="w-9 h-9 rounded-full object-cover border border-slate-600" />
+                  <div>
+                    <p id="chatHeaderName" class="text-sm font-medium">Selecciona un contacto</p>
+                    <p class="text-[11px] text-slate-300/60">Mensajeria en tiempo real</p>
+                  </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span id="serviceRoleBadge" class="service-pill rounded-full px-2.5 py-0.5 text-[11px]">Sin servicio activo</span>
+                  <span id="serviceTimer" class="rounded-full border border-success-500/20 bg-success-500/10 px-2.5 py-0.5 text-xs font-semibold text-success-400">00:00:00</span>
+                  <button type="button" id="btnStartService" onclick="startService()" class="service-action btn-success text-xs px-3 py-1.5">Iniciar servicio</button>
+                  <button type="button" id="btnStopService" onclick="stopService()" class="service-action rounded-xl bg-amber-600 hover:bg-amber-500 transition px-3 py-1.5 text-xs font-medium text-white">Detener servicio</button>
+                </div>
+              </div>
+              <div class="px-4 py-2.5 border-b border-slate-800/40 bg-slate-950/20">
+                <div class="grid sm:grid-cols-3 gap-2 text-xs">
+                  <div class="stat-card">
+                    <p class="section-label">Estado</p>
+                    <p id="serviceStateText" class="mt-1 font-medium text-slate-200">Selecciona un chat</p>
+                  </div>
+                  <div class="stat-card">
+                    <p class="section-label">Creditos calculados</p>
+                    <p id="serviceCreditsPreview" class="mt-1 font-medium text-success-400">0</p>
+                  </div>
+                  <div class="stat-card">
+                    <p class="section-label">Calculo</p>
+                    <p class="mt-1 font-medium text-slate-200">El sistema calcula automaticamente los creditos segun el tiempo de servicio.</p>
+                  </div>
+                </div>
+              </div>
+              <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+              <form id="chatForm" class="border-t border-slate-800/40 p-3 space-y-2">
+                <textarea id="chatText" rows="2" maxlength="1200" class="input-base resize-none" placeholder="Escribe un mensaje"></textarea>
+                <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+                  <input id="chatImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif"
+                    class="text-xs text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-800 file:px-3 file:py-1.5 file:text-slate-200 hover:file:bg-slate-700 file:text-xs file:cursor-pointer" />
+                  <div id="chatUploadPreview" class="upload-preview sm:max-w-[220px] w-full">
+                    <span>Preview de imagen de chat</span>
+                  </div>
+                  <button type="submit" id="btnSendMessage" class="sm:ml-auto btn-primary text-sm px-4 py-2">Enviar mensaje</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== HISTORY ===== -->
+        <section id="section-history" class="app-section hidden fade-in">
+          <div class="card p-5">
+            <h2 class="text-base font-semibold">Historial de creditos</h2>
+            <p class="text-xs text-slate-500 mt-1">Solo se cargan transferencias donde participa el usuario actual.</p>
+            <div id="historyList" class="mt-4 space-y-2"></div>
+          </div>
+          <div class="card p-5 mt-4">
+            <h3 class="text-base font-semibold">Historial financiero profesional</h3>
+            <p class="text-xs text-slate-500 mt-1">Registro unificado de creditos ganados, gastados, compras e intercambios.</p>
+            <div id="transactionsList" class="mt-4 space-y-2">
+              <div class="soft-loader text-xs text-slate-400">Cargando transacciones...</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== BUY CREDITS ===== -->
+        <section id="section-buy-credits" class="app-section hidden fade-in">
+          <div class="grid xl:grid-cols-[1.2fr_1fr] gap-4">
+            <div class="card p-5">
+              <h2 class="text-base font-semibold">Comprar Creditos</h2>
+              <p class="text-xs text-slate-500 mt-1">Simulacion para recargar tu saldo dentro de la plataforma.</p>
+              <div class="mt-4 rounded-xl border border-success-500/15 bg-success-500/5 p-4">
+                <p class="section-label text-success-400">Saldo actual</p>
+                <p id="buyCreditsCurrentBalance" class="mt-2 text-2xl font-semibold text-success-400">0</p>
+              </div>
+              <div class="mt-4 grid sm:grid-cols-3 gap-3">
+                <button type="button" data-buy-credits="5" class="credit-buy-btn p-4 text-left">
+                  <p class="section-label text-success-400">Paquete basico</p>
+                  <p class="mt-2 text-xl font-semibold">+5</p>
+                  <p class="text-xs text-slate-500 mt-1">Recarga rapida</p>
+                </button>
+                <button type="button" data-buy-credits="10" class="credit-buy-btn p-4 text-left">
+                  <p class="section-label text-success-400">Paquete pro</p>
+                  <p class="mt-2 text-xl font-semibold">+10</p>
+                  <p class="text-xs text-slate-500 mt-1">Mayor alcance</p>
+                </button>
+                <button type="button" data-buy-credits="20" class="credit-buy-btn p-4 text-left">
+                  <p class="section-label text-success-400">Paquete premium</p>
+                  <p class="mt-2 text-xl font-semibold">+20</p>
+                  <p class="text-xs text-slate-500 mt-1">Impulso completo</p>
+                </button>
+              </div>
+            </div>
+            <div class="card p-5">
+              <h3 class="text-base font-semibold">Informacion</h3>
+              <div class="mt-4 space-y-2 text-xs text-slate-400">
+                <div class="stat-card p-4">
+                  <p class="font-semibold text-slate-200 text-sm">Operacion simulada</p>
+                  <p class="mt-1">La recarga es demostrativa y no procesa cobros reales.</p>
+                </div>
+                <div class="stat-card p-4">
+                  <p class="font-semibold text-slate-200 text-sm">Actualizacion inmediata</p>
+                  <p class="mt-1">El saldo y el historial se actualizan en tiempo real.</p>
+                </div>
+                <div class="stat-card p-4">
+                  <p class="font-semibold text-slate-200 text-sm">Calculo transparente</p>
+                  <p class="mt-1">Los creditos se calculan automaticamente.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== MARKETPLACE ===== -->
+        <section id="section-marketplace" class="app-section hidden fade-in">
+          <div class="card p-5">
+            <h2 class="text-base font-semibold">Marketplace</h2>
+            <p class="text-xs text-slate-500 mt-1">Canjea tus creditos por productos o experiencias de valor profesional.</p>
+            <div class="mt-4 rounded-xl border border-slate-800 bg-slate-900/40 p-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p class="section-label">Saldo disponible</p>
+                <p id="marketplaceCurrentBalance" class="mt-1 text-xl font-semibold text-success-400">0</p>
+              </div>
+              <span class="text-[11px] text-slate-400 rounded-full border border-slate-700 px-3 py-1">Canje en creditos</span>
+            </div>
+            <div id="marketplaceList" class="mt-4 grid md:grid-cols-2 xl:grid-cols-3 gap-3">
+              <div class="soft-loader text-xs text-slate-400">Cargando catalogo...</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== NOTIFICATIONS ===== -->
+        <section id="section-notifications" class="app-section hidden fade-in">
+          <div class="card p-5">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <h2 class="text-base font-semibold">Notificaciones</h2>
+                <p class="text-xs text-slate-500 mt-1">Alertas en tiempo real de mensajes, compras, reputacion y creditos.</p>
+              </div>
+              <button id="btnMarkAllNotifsReadPage" type="button" class="btn-outline text-xs px-3 py-1.5">Marcar todo como leido</button>
+            </div>
+            <div id="notificationsPageList" class="mt-4 space-y-2">
+              <div class="soft-loader text-xs text-slate-400">Esperando notificaciones...</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== SERVICES ===== -->
+        <section id="section-services" class="app-section hidden fade-in">
+          <div
+            class="hero-banner rounded-2xl p-6 sm:p-8 border border-slate-800/40 mb-5"
+            style="background-image:url('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=1400');"
+          >
+            <p class="section-label text-success-400">Servicios por tiempo</p>
+            <h2 class="mt-3 text-xl sm:text-2xl font-semibold max-w-2xl leading-tight">Cronometro de servicios con liquidacion automatica de creditos.</h2>
+            <p class="mt-2 text-sm max-w-2xl text-slate-300/80">
+              El cliente controla el servicio, el proveedor recibe creditos y todo queda protegido con transacciones seguras.
+            </p>
+          </div>
+          <div class="grid xl:grid-cols-[1.1fr_1fr] gap-4">
+            <div class="card p-5 service-feature">
+              <h3 class="text-base font-semibold">Servicio activo</h3>
+              <p class="text-xs text-slate-500 mt-1">Selecciona un chat y controla el cronometro desde la vista de mensajeria.</p>
+              <div class="mt-4 grid sm:grid-cols-3 gap-2">
+                <div class="stat-card p-3.5">
+                  <p class="section-label">Chat actual</p>
+                  <p id="servicesActiveChat" class="mt-1.5 text-sm font-medium text-slate-200">Sin chat seleccionado</p>
+                </div>
+                <div class="stat-card p-3.5">
+                  <p class="section-label">Duracion</p>
+                  <p id="servicesLiveDuration" class="mt-1.5 text-sm font-medium text-success-400">00:00:00</p>
+                </div>
+                <div class="stat-card p-3.5">
+                  <p class="section-label">Creditos</p>
+                  <p id="servicesLiveCredits" class="mt-1.5 text-sm font-medium text-warn-400">0</p>
+                </div>
+              </div>
+              <div class="mt-3 stat-card p-3.5">
+                <p class="section-label">Estado del servicio</p>
+                <p id="servicesLiveStatus" class="mt-1.5 text-sm font-semibold text-slate-200">Sin actividad</p>
+                <p id="servicesLiveMeta" class="hidden mt-1.5 text-xs text-slate-400">Abre un chat para activar el panel operativo.</p>
+                <p class="mt-1.5 text-xs text-slate-400">El sistema calcula automaticamente los creditos segun el tiempo de servicio.</p>
+              </div>
+            </div>
+            <div class="card p-5 service-feature">
+              <h3 class="text-base font-semibold">Informacion del servicio</h3>
+              <div class="mt-4 space-y-2 text-xs text-slate-400">
+                <div class="stat-card p-3.5">
+                  <p class="font-semibold text-slate-200 text-sm">Gestion automatica</p>
+                  <p class="mt-1">El sistema calcula automaticamente los creditos segun el tiempo de servicio.</p>
+                </div>
+                <div class="stat-card p-3.5">
+                  <p class="font-semibold text-slate-200 text-sm">Tiempo y creditos</p>
+                  <p class="mt-1">El sistema calcula automaticamente los creditos segun el tiempo de servicio.</p>
+                </div>
+                <div class="stat-card p-3.5">
+                  <p class="font-semibold text-slate-200 text-sm">Control</p>
+                  <p class="mt-1">El sistema calcula automaticamente los creditos segun el tiempo de servicio.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </section>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Google Login with Supabase -->
+  <script>
+    document.getElementById("btnLoginGoogle").addEventListener("click", async () => {
+      const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: "https://banco-tiempo-eight.vercel.app"
+        }
+      });
+      if (error) {
+        console.error("Error login Google:", error);
+      }
+    });
+  </script>
+
+  <!-- Original app logic -->
+  <script src="app.js"></script>
+
+  <!-- Coins / Wallet / Transactions module -->
+  <script>
+    (function () {
+      if (window.__galileoCoinsBooted) {
+        return;
+      }
+      window.__galileoCoinsBooted = true;
+
+      async function ensureWallet(userId) {
+        var uid = safeString(userId, "");
+        if (!uid) {
+          return;
+        }
+
+        var existing = await supabase
+          .from("wallets")
+          .select("user_id")
+          .eq("user_id", uid)
+          .maybeSingle();
+
+        if (existing.error) {
+          console.error(existing.error);
+          return;
+        }
+
+        if (!existing.data) {
+          var created = await supabase
+            .from("wallets")
+            .insert({
+              user_id: uid,
+              balance: 0
+            });
+          if (created.error) {
+            console.error(created.error);
+          }
+        }
+      }
+
+      async function getBalance(userId) {
+        const { data, error } = await supabase
+          .from("wallets")
+          .select("balance")
+          .eq("user_id", userId)
+          .single();
+
+        if (error) {
+          if (error.code !== "PGRST116") {
+            console.error(error);
+          }
+          return 0;
+        }
+
+        return data && Number.isFinite(Number(data.balance)) ? Number(data.balance) : 0;
+      }
+
+      async function addCoins(userId, amount, description = "Ingreso") {
+        var uid = safeString(userId, "");
+        var safeAmount = Math.max(0, safeInt(amount, 0));
+        if (!uid || safeAmount <= 0) {
+          return;
+        }
+
+        await ensureWallet(uid);
+
+        const { error: rpcError } = await supabase.rpc("increment_coins", {
+          uid: uid,
+          amount_value: safeAmount
+        });
+        if (rpcError) {
+          console.error(rpcError);
+          return;
+        }
+
+        const { error: txError } = await supabase.from("transactions").insert({
+          user_id: uid,
+          type: "earn",
+          amount: safeAmount,
+          description: safeString(description, "Ingreso")
+        });
+        if (txError) {
+          console.error(txError);
+        }
+      }
+
+      async function spendCoins(userId, amount, description = "Gasto") {
+        var uid = safeString(userId, "");
+        var safeAmount = Math.max(0, safeInt(amount, 0));
+        if (!uid || safeAmount <= 0) {
+          return false;
+        }
+
+        await ensureWallet(uid);
+
+        const balance = await getBalance(uid);
+
+        if (balance < safeAmount) {
+          return false;
+        }
+
+        const { error: rpcError } = await supabase.rpc("decrement_coins", {
+          uid: uid,
+          amount_value: safeAmount
+        });
+        if (rpcError) {
+          console.error(rpcError);
+          return false;
+        }
+
+        const { error: txError } = await supabase.from("transactions").insert({
+          user_id: uid,
+          type: "spend",
+          amount: safeAmount,
+          description: safeString(description, "Gasto")
+        });
+        if (txError) {
+          console.error(txError);
+        }
+
+        return true;
+      }
+
+      async function getTransactions(userId) {
+        return await supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false });
+      }
+
+      if (auth && typeof auth.onAuthStateChanged === "function") {
+        auth.onAuthStateChanged(function (user) {
+          if (!user || !user.uid) {
+            return;
+          }
+          ensureWallet(user.uid).catch(function (error) {
+            console.error(error);
+          });
+        });
+      }
+
+      window.getBalance = getBalance;
+      window.addCoins = addCoins;
+      window.spendCoins = spendCoins;
+      window.getTransactions = getTransactions;
+      window.ensureWallet = ensureWallet;
+    })();
+  </script>
+</body>
+</html>
