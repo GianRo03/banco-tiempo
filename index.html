@@ -510,15 +510,9 @@
     <div class="w-full max-w-4xl grid lg:grid-cols-2 gap-0 items-stretch fade-in overflow-hidden rounded-2xl" style="border: 1px solid rgba(148,163,184,0.08);">
       <!-- Left: Brand panel -->
       <div class="relative p-8 lg:p-10 flex flex-col justify-center" style="background: linear-gradient(145deg, #0c1425, #0f1d32);">
-        <!-- SVG Logo -->
+        <!-- Logo Universidad Galileo -->
         <div class="mb-6">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-label="Banco del Tiempo">
-            <rect x="4" y="4" width="40" height="40" rx="12" stroke="#0ea5e9" stroke-width="2" fill="none"/>
-            <circle cx="24" cy="22" r="8" stroke="#0ea5e9" stroke-width="1.5" fill="none"/>
-            <path d="M24 18v4l2.5 2.5" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M16 36h16" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M20 33h8" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
+          <img src="galileo-logo.jpg" alt="Universidad Galileo" class="w-full max-w-[280px] h-auto rounded-lg" />
         </div>
         <p class="section-label text-accent-400">Banco del Tiempo</p>
         <h1 class="text-2xl lg:text-3xl font-bold mt-3 leading-tight tracking-tight">Intercambio de habilidades y servicios</h1>
@@ -1012,37 +1006,27 @@
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Google Login with Supabase -->
-  <script>
-    document.getElementById("btnLoginGoogle").addEventListener("click", async () => {
-      const { data, error } = await supabaseClient.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: "https://banco-tiempo-eight.vercel.app"
-        }
-      });
-      if (error) {
-        console.error("Error login Google:", error);
-      }
-    });
-  </script>
-
-  <!-- Original app logic -->
+  <!-- Original app logic (handles all auth: email login, register, Google OAuth, logout) -->
   <script src="app.js"></script>
 
-  <!-- Coins / Wallet / Transactions module -->
+  <!-- Coins / Wallet / Transactions module (runs after app.js so supabase, auth, safeString, safeInt are available) -->
   <script>
     (function () {
-      if (window.__galileoCoinsBooted) {
-        return;
-      }
+      if (window.__galileoCoinsBooted) return;
       window.__galileoCoinsBooted = true;
 
+      // Guard: wait for app.js globals
+      if (typeof supabase === "undefined") {
+        console.warn("[coins] supabase client not found, skipping coins module.");
+        return;
+      }
+
+      var _safe = typeof safeString === "function" ? safeString : function(v, fb) { return (typeof v === "string" && v) ? v : (fb || ""); };
+      var _safeInt = typeof safeInt === "function" ? safeInt : function(v, fb) { var n = parseInt(v, 10); return isNaN(n) ? (fb || 0) : n; };
+
       async function ensureWallet(userId) {
-        var uid = safeString(userId, "");
-        if (!uid) {
-          return;
-        }
+        var uid = _safe(userId, "");
+        if (!uid) return;
 
         var existing = await supabase
           .from("wallets")
@@ -1050,123 +1034,53 @@
           .eq("user_id", uid)
           .maybeSingle();
 
-        if (existing.error) {
-          console.error(existing.error);
-          return;
-        }
+        if (existing.error) { console.error(existing.error); return; }
 
         if (!existing.data) {
-          var created = await supabase
-            .from("wallets")
-            .insert({
-              user_id: uid,
-              balance: 0
-            });
-          if (created.error) {
-            console.error(created.error);
-          }
+          var created = await supabase.from("wallets").insert({ user_id: uid, balance: 0 });
+          if (created.error) console.error(created.error);
         }
       }
 
       async function getBalance(userId) {
-        const { data, error } = await supabase
-          .from("wallets")
-          .select("balance")
-          .eq("user_id", userId)
-          .single();
-
-        if (error) {
-          if (error.code !== "PGRST116") {
-            console.error(error);
-          }
-          return 0;
-        }
-
-        return data && Number.isFinite(Number(data.balance)) ? Number(data.balance) : 0;
+        var r = await supabase.from("wallets").select("balance").eq("user_id", userId).single();
+        if (r.error) { if (r.error.code !== "PGRST116") console.error(r.error); return 0; }
+        return r.data && Number.isFinite(Number(r.data.balance)) ? Number(r.data.balance) : 0;
       }
 
-      async function addCoins(userId, amount, description = "Ingreso") {
-        var uid = safeString(userId, "");
-        var safeAmount = Math.max(0, safeInt(amount, 0));
-        if (!uid || safeAmount <= 0) {
-          return;
-        }
-
+      async function addCoins(userId, amount, description) {
+        var uid = _safe(userId, "");
+        var safeAmount = Math.max(0, _safeInt(amount, 0));
+        if (!uid || safeAmount <= 0) return;
         await ensureWallet(uid);
-
-        const { error: rpcError } = await supabase.rpc("increment_coins", {
-          uid: uid,
-          amount_value: safeAmount
-        });
-        if (rpcError) {
-          console.error(rpcError);
-          return;
-        }
-
-        const { error: txError } = await supabase.from("transactions").insert({
-          user_id: uid,
-          type: "earn",
-          amount: safeAmount,
-          description: safeString(description, "Ingreso")
-        });
-        if (txError) {
-          console.error(txError);
-        }
+        var rpc = await supabase.rpc("increment_coins", { uid: uid, amount_value: safeAmount });
+        if (rpc.error) { console.error(rpc.error); return; }
+        var tx = await supabase.from("transactions").insert({ user_id: uid, type: "earn", amount: safeAmount, description: _safe(description, "Ingreso") });
+        if (tx.error) console.error(tx.error);
       }
 
-      async function spendCoins(userId, amount, description = "Gasto") {
-        var uid = safeString(userId, "");
-        var safeAmount = Math.max(0, safeInt(amount, 0));
-        if (!uid || safeAmount <= 0) {
-          return false;
-        }
-
+      async function spendCoins(userId, amount, description) {
+        var uid = _safe(userId, "");
+        var safeAmount = Math.max(0, _safeInt(amount, 0));
+        if (!uid || safeAmount <= 0) return false;
         await ensureWallet(uid);
-
-        const balance = await getBalance(uid);
-
-        if (balance < safeAmount) {
-          return false;
-        }
-
-        const { error: rpcError } = await supabase.rpc("decrement_coins", {
-          uid: uid,
-          amount_value: safeAmount
-        });
-        if (rpcError) {
-          console.error(rpcError);
-          return false;
-        }
-
-        const { error: txError } = await supabase.from("transactions").insert({
-          user_id: uid,
-          type: "spend",
-          amount: safeAmount,
-          description: safeString(description, "Gasto")
-        });
-        if (txError) {
-          console.error(txError);
-        }
-
+        var balance = await getBalance(uid);
+        if (balance < safeAmount) return false;
+        var rpc = await supabase.rpc("decrement_coins", { uid: uid, amount_value: safeAmount });
+        if (rpc.error) { console.error(rpc.error); return false; }
+        var tx = await supabase.from("transactions").insert({ user_id: uid, type: "spend", amount: safeAmount, description: _safe(description, "Gasto") });
+        if (tx.error) console.error(tx.error);
         return true;
       }
 
       async function getTransactions(userId) {
-        return await supabase
-          .from("transactions")
-          .select("*")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false });
+        return await supabase.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false });
       }
 
-      if (auth && typeof auth.onAuthStateChanged === "function") {
+      if (typeof auth !== "undefined" && auth && typeof auth.onAuthStateChanged === "function") {
         auth.onAuthStateChanged(function (user) {
-          if (!user || !user.uid) {
-            return;
-          }
-          ensureWallet(user.uid).catch(function (error) {
-            console.error(error);
-          });
+          if (!user || !user.uid) return;
+          ensureWallet(user.uid).catch(function (e) { console.error(e); });
         });
       }
 
