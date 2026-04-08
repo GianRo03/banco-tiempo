@@ -512,7 +512,7 @@
       <div class="relative p-8 lg:p-10 flex flex-col justify-center" style="background: linear-gradient(145deg, #0c1425, #0f1d32);">
         <!-- Logo Universidad Galileo -->
         <div class="mb-6">
-          <img src="galileo-logo.jpg" alt="Universidad Galileo" class="w-full max-w-[280px] h-auto rounded-lg" />
+          <img src="galileo-logo.jpg" alt="Universidad Galileo" class="w-full max-w-[280px] h-auto rounded-xl bg-white/90 p-3" style="mix-blend-mode: normal;" />
         </div>
         <p class="section-label text-accent-400">Banco del Tiempo</p>
         <h1 class="text-2xl lg:text-3xl font-bold mt-3 leading-tight tracking-tight">Intercambio de habilidades y servicios</h1>
@@ -1016,8 +1016,8 @@
       window.__galileoCoinsBooted = true;
 
       // Guard: wait for app.js globals
-      if (typeof supabase === "undefined") {
-        console.warn("[coins] supabase client not found, skipping coins module.");
+      if (typeof sb === "undefined") {
+        console.warn("[coins] sb client not found, skipping coins module.");
         return;
       }
 
@@ -1028,7 +1028,7 @@
         var uid = _safe(userId, "");
         if (!uid) return;
 
-        var existing = await supabase
+        var existing = await sb
           .from("wallets")
           .select("user_id")
           .eq("user_id", uid)
@@ -1037,13 +1037,13 @@
         if (existing.error) { console.error(existing.error); return; }
 
         if (!existing.data) {
-          var created = await supabase.from("wallets").insert({ user_id: uid, balance: 0 });
+          var created = await sb.from("wallets").insert({ user_id: uid, balance: 0 });
           if (created.error) console.error(created.error);
         }
       }
 
       async function getBalance(userId) {
-        var r = await supabase.from("wallets").select("balance").eq("user_id", userId).single();
+        var r = await sb.from("wallets").select("balance").eq("user_id", userId).single();
         if (r.error) { if (r.error.code !== "PGRST116") console.error(r.error); return 0; }
         return r.data && Number.isFinite(Number(r.data.balance)) ? Number(r.data.balance) : 0;
       }
@@ -1053,9 +1053,9 @@
         var safeAmount = Math.max(0, _safeInt(amount, 0));
         if (!uid || safeAmount <= 0) return;
         await ensureWallet(uid);
-        var rpc = await supabase.rpc("increment_coins", { uid: uid, amount_value: safeAmount });
+        var rpc = await sb.rpc("increment_coins", { uid: uid, amount_value: safeAmount });
         if (rpc.error) { console.error(rpc.error); return; }
-        var tx = await supabase.from("transactions").insert({ user_id: uid, type: "earn", amount: safeAmount, description: _safe(description, "Ingreso") });
+        var tx = await sb.from("transactions").insert({ user_id: uid, type: "earn", amount: safeAmount, description: _safe(description, "Ingreso") });
         if (tx.error) console.error(tx.error);
       }
 
@@ -1066,15 +1066,15 @@
         await ensureWallet(uid);
         var balance = await getBalance(uid);
         if (balance < safeAmount) return false;
-        var rpc = await supabase.rpc("decrement_coins", { uid: uid, amount_value: safeAmount });
+        var rpc = await sb.rpc("decrement_coins", { uid: uid, amount_value: safeAmount });
         if (rpc.error) { console.error(rpc.error); return false; }
-        var tx = await supabase.from("transactions").insert({ user_id: uid, type: "spend", amount: safeAmount, description: _safe(description, "Gasto") });
+        var tx = await sb.from("transactions").insert({ user_id: uid, type: "spend", amount: safeAmount, description: _safe(description, "Gasto") });
         if (tx.error) console.error(tx.error);
         return true;
       }
 
       async function getTransactions(userId) {
-        return await supabase.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false });
+        return await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false });
       }
 
       if (typeof auth !== "undefined" && auth && typeof auth.onAuthStateChanged === "function") {

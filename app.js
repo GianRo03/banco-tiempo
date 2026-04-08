@@ -1,4 +1,4 @@
-﻿
+
     // ==============================
     // 1) CONFIGURACION SUPABASE
     // ==============================
@@ -6,7 +6,7 @@
     const SUPABASE_URL = "https://ijebomcckctjwjtlvzbq.supabase.co";
     const SUPABASE_KEY = "sb_publishable_Fxei-HvrWPaYI3Jpj3L5WQ_laIMFaW_";
 
-    const supabase = window.supabase.createClient(
+    const sb = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_KEY
     );
@@ -317,7 +317,7 @@
         email: safeString(email, ""),
         password: safeString(password, "")
       };
-      var result = await supabase.auth.signUp(payload);
+      var result = await sb.auth.signUp(payload);
       if (result.error) {
         console.error(result.error);
         throw normalizeSupabaseError(result.error);
@@ -328,7 +328,7 @@
     }
 
     async function login(email, password) {
-      var result = await supabase.auth.signInWithPassword({
+      var result = await sb.auth.signInWithPassword({
         email: safeString(email, ""),
         password: safeString(password, "")
       });
@@ -342,14 +342,14 @@
     }
 
     async function logout() {
-      var result = await supabase.auth.signOut();
+      var result = await sb.auth.signOut();
       if (result.error) {
         throw normalizeSupabaseError(result.error);
       }
     }
 
     async function getUser() {
-      var result = await supabase.auth.getUser();
+      var result = await sb.auth.getUser();
       if (result.error) {
         throw normalizeSupabaseError(result.error);
       }
@@ -628,7 +628,7 @@
         throw new Error("Referencia de documento invalida.");
       }
 
-      var query = supabase.from(meta.table).select("*").eq("id", meta.id);
+      var query = sb.from(meta.table).select("*").eq("id", meta.id);
       if (meta.userId) {
         query = query.eq("user_id", meta.userId);
       }
@@ -652,7 +652,7 @@
         throw new Error("Referencia de coleccion invalida.");
       }
 
-      var query = supabase.from(meta.table).select("*");
+      var query = sb.from(meta.table).select("*");
 
       if (meta.userId) {
         query = query.eq("user_id", meta.userId);
@@ -717,7 +717,7 @@
       }
 
       var onConflictColumns = meta.userId ? "id,user_id" : "id";
-      var result = await supabase
+      var result = await sb
         .from(meta.table)
         .upsert(payload, { onConflict: onConflictColumns });
 
@@ -735,7 +735,7 @@
       var payload = serializeForTable(meta, data || {});
       delete payload.id;
 
-      var query = supabase.from(meta.table).update(payload).eq("id", meta.id);
+      var query = sb.from(meta.table).update(payload).eq("id", meta.id);
       if (meta.userId) {
         query = query.eq("user_id", meta.userId);
       }
@@ -755,7 +755,7 @@
         throw new Error("Referencia de documento invalida.");
       }
 
-      var query = supabase.from(meta.table).delete().eq("id", meta.id);
+      var query = sb.from(meta.table).delete().eq("id", meta.id);
       if (meta.userId) {
         query = query.eq("user_id", meta.userId);
       }
@@ -1005,13 +1005,13 @@
         });
       }
 
-      supabase.auth.getUser().then(function (result) {
+      sb.auth.getUser().then(function (result) {
         if (result && !result.error) {
           emit(result.data ? result.data.user : null);
         }
       });
 
-      supabase.auth.onAuthStateChange(function (_event, session) {
+      sb.auth.onAuthStateChange(function (_event, session) {
         emit(session ? session.user : null);
       });
 
@@ -1026,7 +1026,7 @@
           return register(email, password);
         },
         signInWithPopup: async function () {
-          var result = await supabase.auth.signInWithOAuth({
+          var result = await sb.auth.signInWithOAuth({
             provider: "google",
             options: {
               redirectTo: window.location.href,
@@ -1421,7 +1421,7 @@
     async function subirImagen(file, userId) {
       const fileName = userId + "_" + Date.now();
 
-      const { data, error } = await supabase.storage
+      const { data, error } = await sb.storage
           .from("imagenes")
           .upload(fileName, file, { upsert: true });
 
@@ -1430,7 +1430,7 @@
           return null;
       }
 
-      const { data: urlData } = supabase.storage
+      const { data: urlData } = sb.storage
           .from("imagenes")
           .getPublicUrl(fileName);
 
@@ -2198,7 +2198,7 @@
     function subscribeMessagesForActiveChat() {
       stopListener("messages");
       if (chatRealtimeChannel) {
-        supabase.removeChannel(chatRealtimeChannel);
+        sb.removeChannel(chatRealtimeChannel);
         chatRealtimeChannel = null;
       }
       ui.messagesContainer.innerHTML = "";
@@ -2240,7 +2240,7 @@
       });
 
       var channelName = "chat";
-      chatRealtimeChannel = supabase
+      chatRealtimeChannel = sb
         .channel(channelName)
         .on(
           "postgres_changes",
@@ -2260,7 +2260,7 @@
 
       unsubscribers.messages = function () {
         if (chatRealtimeChannel) {
-          supabase.removeChannel(chatRealtimeChannel);
+          sb.removeChannel(chatRealtimeChannel);
           chatRealtimeChannel = null;
         }
       };
@@ -2799,7 +2799,7 @@
           return;
         }
 
-        var existing = await supabase
+        var existing = await sb
           .from("wallets")
           .select("user_id")
           .eq("user_id", uid)
@@ -2811,7 +2811,7 @@
         }
 
         if (!existing.data) {
-          var created = await supabase
+          var created = await sb
             .from("wallets")
             .insert({
               user_id: uid,
@@ -2824,7 +2824,7 @@
       }
 
       async function getBalance(userId) {
-        const { data, error } = await supabase
+        const { data, error } = await sb
           .from("wallets")
           .select("balance")
           .eq("user_id", userId)
@@ -2849,7 +2849,7 @@
 
         await ensureWallet(uid);
 
-        const { error: rpcError } = await supabase.rpc("increment_coins", {
+        const { error: rpcError } = await sb.rpc("increment_coins", {
           uid: uid,
           amount_value: safeAmount
         });
@@ -2858,7 +2858,7 @@
           return;
         }
 
-        const { error: txError } = await supabase.from("transactions").insert({
+        const { error: txError } = await sb.from("transactions").insert({
           user_id: uid,
           type: "earn",
           amount: safeAmount,
@@ -2884,7 +2884,7 @@
           return false;
         }
 
-        const { error: rpcError } = await supabase.rpc("decrement_coins", {
+        const { error: rpcError } = await sb.rpc("decrement_coins", {
           uid: uid,
           amount_value: safeAmount
         });
@@ -2893,7 +2893,7 @@
           return false;
         }
 
-        const { error: txError } = await supabase.from("transactions").insert({
+        const { error: txError } = await sb.from("transactions").insert({
           user_id: uid,
           type: "spend",
           amount: safeAmount,
@@ -2907,7 +2907,7 @@
       }
 
       async function getTransactions(userId) {
-        return await supabase
+        return await sb
           .from("transactions")
           .select("*")
           .eq("user_id", userId)
