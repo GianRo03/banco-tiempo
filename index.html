@@ -1659,37 +1659,17 @@
         }
         try{
           setLoading(true,'Deteniendo servicio...');
-          // Read service doc directly via Supabase (bypass adapter caching)
-          var chatId=state.activeChatId;
-          var {data:svcRow,error:svcErr}=await sb.from('services').select('*').eq('id',chatId).limit(1);
-          if(svcErr) throw new Error(svcErr.message);
-          var sd=(svcRow&&svcRow[0])||null;
-          if(!sd) throw new Error('No existe un servicio activo para este chat.');
-          if(sd.clientId!==state.uid) throw new Error('Solo el cliente que inicio el servicio puede detenerlo.');
-          if(sd.status!=='active') throw new Error('Este servicio ya fue finalizado.');
-
-          var endTime=Date.now();
-          var duration=Math.max(0,endTime-Math.max(0,parseInt(sd.startTime)||0));
-          var creditsGiven=Math.floor(Math.floor(duration/60000)/30);
-
-          // Read client and provider profiles
-          var clientRef=db.collection('users').doc(state.uid);
-          var providerRef=db.collection('users').doc(state.activeChatUserId);
-          var serviceRef=db.collection('services').doc(chatId);
-          var historyRef=db.collection('history').doc();
-
-          await db.runTransaction(async function(tx){
-            var cSnap=await tx.get(clientRef),pSnap=await tx.get(providerRef);
-            if(!cSnap.exists||!pSnap.exists) throw new Error('No se pudieron cargar los perfiles.');
-            var c=normalizeUserDoc(cSnap.data(),state.authUser),p=normalizeUserDoc(pSnap.data(),null);
-            if(creditsGiven>0&&c.credits<creditsGiven) throw new Error('No tienes Galileo Coins suficientes.');
-            tx.update(clientRef,{credits:c.credits-creditsGiven});
-            tx.update(providerRef,{credits:p.credits+creditsGiven});
-            tx.update(serviceRef,{endTime:endTime,duration:duration,creditsGiven:creditsGiven,status:'completed'});
-            tx.set(historyRef,{from:sd.clientId,to:sd.providerId,amount:creditsGiven,credits:creditsGiven,duration:duration,time:endTime,timestamp:endTime});
-          });
-          showToast('Servicio finalizado y Galileo Coins transferidos correctamente.','success');
-        }catch(e){showToast(typeof parseFirebaseError==='function'?parseFirebaseError(e):(e.message||String(e)),'error');}finally{setLoading(false);}
+          var {data,error}=await sb.rpc('stop_service',{chat_id:state.activeChatId});
+          if(error) throw new Error(error.message);
+          var gc=data&&data.creditsGiven?data.creditsGiven:0;
+          showToast('Servicio finalizado.'+(gc>0?' Se transfirieron '+gc+' Galileo Coins.':' Duracion menor a 30 min, sin cobro.'),'success');
+        }catch(e){
+          var msg=e.message||String(e);
+          if(msg.indexOf('NO_ACTIVE_SERVICE')!==-1) msg='No hay servicio activo en este chat.';
+          else if(msg.indexOf('NOT_CLIENT')!==-1) msg='Solo el cliente puede detener el servicio.';
+          else if(msg.indexOf('INSUFFICIENT_FUNDS')!==-1) msg='No tienes Galileo Coins suficientes.';
+          showToast(msg,'error');
+        }finally{setLoading(false);}
       };
     },200);
   })();
