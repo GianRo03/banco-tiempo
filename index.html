@@ -53,11 +53,17 @@
     /* ===== LOADING OVERLAY ===== */
     #loadingOverlay {
       position: fixed; inset: 0; z-index: 9999;
-      background: #0a0e1a;
+      background: rgba(10,14,26,0.85);
+      backdrop-filter: blur(4px);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 16px;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.3s ease;
+      pointer-events: auto;
+    }
+    #loadingOverlay.hidden {
+      display: none !important;
+      pointer-events: none;
     }
     #loadingOverlay .spinner {
       width: 48px; height: 48px;
@@ -706,7 +712,7 @@
 <body>
 
   <!-- ========== LOADING OVERLAY ========== -->
-  <div id="loadingOverlay">
+  <div id="loadingOverlay" class="hidden">
     <div class="spinner"></div>
     <!-- SVG Logo: Clock + Coin -->
     <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-label="Banco del Tiempo" style="margin-bottom:4px;">
@@ -722,7 +728,7 @@
   </div>
 
   <!-- ========== TOAST ========== -->
-  <div id="toast" role="alert" aria-live="polite"></div>
+  <div id="toast" class="hidden" role="alert" aria-live="polite"></div>
 
   <!-- ======================================================== -->
   <!-- AUTH SECTION -->
