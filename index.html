@@ -1629,6 +1629,63 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
+  <!-- Expose startService/stopService to global scope for onclick handlers -->
+  <script>
+  (function(){
+    var w=setInterval(function(){
+      if(typeof db==='undefined'||typeof state==='undefined') return;
+      clearInterval(w);
+
+      window.startService=async function(){
+        if(!state.uid||!state.activeChatUserId||!state.activeChatId){
+          showToast('Selecciona un chat antes de iniciar un servicio.','error');return;
+        }
+        var serviceRef=db.collection('services').doc(state.activeChatId);
+        try{
+          setLoading(true,'Iniciando servicio...');
+          await db.runTransaction(async function(tx){
+            var snap=await tx.get(serviceRef);
+            var cur=snap.exists?(snap.data()||{}):{};  
+            if(safeString(cur.status,'')==='active') throw new Error('Ya existe un servicio activo en este chat.');
+            tx.set(serviceRef,{chatId:state.activeChatId,clientId:state.uid,providerId:state.activeChatUserId,startTime:Date.now(),endTime:0,duration:0,creditsGiven:0,status:'active'},{merge:true});
+          });
+          showToast('Servicio iniciado. El cronometro ya esta corriendo.','success');
+        }catch(e){showToast(parseFirebaseError(e),'error');}finally{setLoading(false);}
+      };
+
+      window.stopService=async function(){
+        if(!state.uid||!state.activeChatUserId||!state.activeChatId){
+          showToast('Selecciona un chat con servicio activo.','error');return;
+        }
+        var serviceRef=db.collection('services').doc(state.activeChatId);
+        var clientRef=db.collection('users').doc(state.uid);
+        var providerRef=db.collection('users').doc(state.activeChatUserId);
+        var historyRef=db.collection('history').doc();
+        try{
+          setLoading(true,'Deteniendo servicio...');
+          await db.runTransaction(async function(tx){
+            var snap=await tx.get(serviceRef);
+            if(!snap.exists) throw new Error('No existe un servicio activo para este chat.');
+            var sd=snap.data()||{};
+            if(safeString(sd.clientId,'')!==state.uid) throw new Error('Solo el cliente que inicio el servicio puede detenerlo.');
+            if(safeString(sd.status,'')!=='active') throw new Error('Este servicio ya fue finalizado.');
+            var endTime=Date.now(),duration=Math.max(0,endTime-Math.max(0,safeInt(sd.startTime,0)));
+            var creditsGiven=Math.floor(Math.floor(duration/60000)/30);
+            var cSnap=await tx.get(clientRef),pSnap=await tx.get(providerRef);
+            if(!cSnap.exists||!pSnap.exists) throw new Error('No se pudieron cargar los perfiles.');
+            var c=normalizeUserDoc(cSnap.data(),state.authUser),p=normalizeUserDoc(pSnap.data(),null);
+            if(creditsGiven>0&&c.credits<creditsGiven) throw new Error('No tienes Galileo Coins suficientes.');
+            tx.update(clientRef,{credits:c.credits-creditsGiven});
+            tx.update(providerRef,{credits:p.credits+creditsGiven});
+            tx.update(serviceRef,{endTime:endTime,duration:duration,creditsGiven:creditsGiven,status:'completed'});
+            tx.set(historyRef,{from:safeString(sd.clientId,''),to:safeString(sd.providerId,''),amount:creditsGiven,credits:creditsGiven,duration:duration,time:endTime,timestamp:endTime});
+          });
+          showToast('Servicio finalizado y Galileo Coins transferidos correctamente.','success');
+        }catch(e){showToast(parseFirebaseError(e),'error');}finally{setLoading(false);}
+      };
+    },200);
+  })();
+  </script>
   <script>
   // === ADMIN & EXTRA FEATURES MODULE ===
   (function() {
