@@ -1117,6 +1117,40 @@
             </div>
 
           </div>
+          <!-- PORTFOLIO SECTION -->
+          <div id="portfolioSection" class="glass" style="border-radius:16px;padding:20px;margin-top:20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+              <h3 style="font-size:15px;font-weight:700;color:#e2e8f0;margin:0;display:flex;align-items:center;gap:8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                Mi Portafolio
+              </h3>
+              <button id="btnTogglePortfolioForm" type="button" style="font-size:12px;padding:6px 14px;border-radius:10px;background:rgba(14,165,233,0.15);color:#7dd3fc;border:1px solid rgba(14,165,233,0.3);cursor:pointer;font-weight:600;">+ Agregar proyecto</button>
+            </div>
+            <div id="portfolioForm" class="hidden" style="margin-bottom:16px;padding:16px;background:rgba(15,23,42,0.6);border-radius:12px;border:1px solid rgba(148,163,184,0.1);">
+              <div style="display:grid;gap:10px;">
+                <input id="portfolioTitle" type="text" maxlength="100" class="input-field" placeholder="Titulo del proyecto" />
+                <textarea id="portfolioDesc" maxlength="500" class="input-field" rows="2" placeholder="Descripcion breve del proyecto" style="resize:vertical;"></textarea>
+                <input id="portfolioImage" type="text" maxlength="500" class="input-field" placeholder="URL de imagen (opcional)" />
+                <input id="portfolioUrl" type="text" maxlength="500" class="input-field" placeholder="URL del proyecto (opcional)" />
+                <button id="btnSavePortfolio" type="button" style="padding:10px;border-radius:10px;background:#0ea5e9;color:#fff;border:none;font-weight:600;font-size:13px;cursor:pointer;">Guardar proyecto</button>
+              </div>
+            </div>
+            <div id="portfolioList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;">
+              <p style="font-size:13px;color:#475569;">Aun no has agregado proyectos a tu portafolio.</p>
+            </div>
+          </div>
+
+          <!-- LEVEL BADGE -->
+          <div id="levelBadgeSection" class="glass" style="border-radius:16px;padding:20px;margin-top:20px;">
+            <h3 style="font-size:15px;font-weight:700;color:#e2e8f0;margin:0 0 14px 0;display:flex;align-items:center;gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Nivel y Reputacion
+            </h3>
+            <div id="levelBadgeContent" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+              <p style="font-size:13px;color:#475569;">Cargando nivel...</p>
+            </div>
+          </div>
+
         </section><!-- /section-dashboard -->
 
 
@@ -1299,6 +1333,30 @@
         <section id="section-history" class="app-section hidden">
           <h2 class="section-title">Historial</h2>
           <p class="section-sub">Registro de tus servicios e intercambios</p>
+
+          <!-- WALLET OVERVIEW -->
+          <div id="walletOverview" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;">
+            <div class="glass" style="border-radius:14px;padding:16px;text-align:center;">
+              <p style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin:0;">Balance</p>
+              <p id="walletBalance" style="font-size:26px;font-weight:800;color:#38bdf8;margin:6px 0 0 0;">0</p>
+              <p style="font-size:11px;color:#475569;margin:2px 0 0 0;">Galileo Coins</p>
+            </div>
+            <div class="glass" style="border-radius:14px;padding:16px;text-align:center;">
+              <p style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin:0;">Ganados</p>
+              <p id="walletEarned" style="font-size:26px;font-weight:800;color:#34d399;margin:6px 0 0 0;">0</p>
+              <p style="font-size:11px;color:#475569;margin:2px 0 0 0;">Total recibido</p>
+            </div>
+            <div class="glass" style="border-radius:14px;padding:16px;text-align:center;">
+              <p style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin:0;">Gastados</p>
+              <p id="walletSpent" style="font-size:26px;font-weight:800;color:#f87171;margin:6px 0 0 0;">0</p>
+              <p style="font-size:11px;color:#475569;margin:2px 0 0 0;">Total gastado</p>
+            </div>
+            <div class="glass" style="border-radius:14px;padding:16px;text-align:center;">
+              <p style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin:0;">Transacciones</p>
+              <p id="walletTxCount" style="font-size:26px;font-weight:800;color:#a78bfa;margin:6px 0 0 0;">0</p>
+              <p style="font-size:11px;color:#475569;margin:2px 0 0 0;">Movimientos</p>
+            </div>
+          </div>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="responsive-grid">
             <div>
@@ -1521,6 +1579,7 @@
   <!-- ========================================= -->
   <!-- SCRIPTS (order is critical) -->
   <!-- ========================================= -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
   <script>
@@ -1758,5 +1817,357 @@
   })();
   </script>
 
+  <!-- ============================================================ -->
+  <!-- ENHANCEMENTS MODULE: PDF, Portfolio, Wallet, Levels, Search  -->
+  <!-- ============================================================ -->
+  <script>
+  (function(){
+    if(window.__enhancementsBooted) return;
+    window.__enhancementsBooted=true;
+
+    var wait=setInterval(function(){
+      if(typeof sb==='undefined'||typeof state==='undefined') return;
+      clearInterval(wait);
+      boot();
+    },300);
+
+    function boot(){
+      // ==============================
+      // PDF GENERATION ON MARKETPLACE REDEEM
+      // ==============================
+      var origSetActive=window.setActiveSection;
+      // Hook into marketplace redeem - override showToast to detect successful canje
+      var _origShowToast=window.showToast;
+      var _lastRedeemProduct=null;
+
+      // Intercept marketplace click to capture product before redeem
+      var mList=document.getElementById('marketplaceList');
+      if(mList){
+        mList.addEventListener('click',function(e){
+          var btn=e.target.closest('[data-market-item]');
+          if(!btn) return;
+          var itemId=btn.getAttribute('data-market-item');
+          _lastRedeemProduct=itemId;
+        },true); // capture phase - runs before app.js handler
+      }
+
+      window.showToast=function(msg,type){
+        _origShowToast(msg,type);
+        if(type==='success'&& msg && msg.indexOf('Canje completado')!==-1 && _lastRedeemProduct){
+          generateRedeemPDF(_lastRedeemProduct);
+          _lastRedeemProduct=null;
+        }
+      };
+
+      function generateRedeemPDF(itemId){
+        try{
+          if(typeof window.jspdf==='undefined') return;
+          var jsPDF=window.jspdf.jsPDF;
+          var doc=new jsPDF();
+          var now=new Date();
+          var user=state.myProfile||{};
+          var email=user.email||'Estudiante';
+
+          // Product catalog lookup
+          var products={
+            'book':{name:'Libro de Productividad',desc:'Guia practica para mejorar gestion de tiempo y foco. Incluye 12 capitulos con ejercicios, plantillas de planificacion semanal, y tecnicas de enfoque profundo basadas en metodologias Pomodoro y GTD.'},
+            'course':{name:'Mini Curso de Liderazgo',desc:'Contenido formativo sobre comunicacion, colaboracion y liderazgo efectivo. Incluye 5 modulos: Comunicacion Asertiva, Trabajo en Equipo, Resolucion de Conflictos, Delegacion Efectiva y Liderazgo Situacional.'},
+            'advisory':{name:'Asesoria Profesional',desc:'Sesion personalizada 1 a 1 para orientar carrera o proyecto. Incluye revision de perfil profesional, recomendaciones personalizadas y plan de accion a 30 dias.'}
+          };
+          var p=products[itemId]||{name:itemId,desc:'Producto canjeado en Banco del Tiempo.'};
+
+          // Header
+          doc.setFillColor(10,14,26);
+          doc.rect(0,0,210,45,'F');
+          doc.setFillColor(14,165,233);
+          doc.rect(0,42,210,3,'F');
+
+          doc.setTextColor(255,255,255);
+          doc.setFontSize(22);
+          doc.setFont('helvetica','bold');
+          doc.text('BANCO DEL TIEMPO',105,20,{align:'center'});
+          doc.setFontSize(11);
+          doc.setFont('helvetica','normal');
+          doc.setTextColor(148,163,184);
+          doc.text('Universidad Galileo — Certificado de Canje',105,30,{align:'center'});
+          doc.setFontSize(9);
+          doc.text('Galileo Coins Marketplace',105,37,{align:'center'});
+
+          // Body
+          doc.setTextColor(30,41,59);
+          doc.setFontSize(16);
+          doc.setFont('helvetica','bold');
+          doc.text(p.name,20,60);
+
+          doc.setDrawColor(14,165,233);
+          doc.setLineWidth(0.5);
+          doc.line(20,64,190,64);
+
+          doc.setFontSize(11);
+          doc.setFont('helvetica','normal');
+          doc.setTextColor(71,85,105);
+          var lines=doc.splitTextToSize(p.desc,170);
+          doc.text(lines,20,74);
+
+          var yPos=74+lines.length*6+15;
+
+          // Details box
+          doc.setFillColor(241,245,249);
+          doc.roundedRect(20,yPos,170,50,4,4,'F');
+
+          doc.setFontSize(10);
+          doc.setTextColor(100,116,139);
+          doc.text('DETALLES DEL CANJE',28,yPos+12);
+
+          doc.setTextColor(30,41,59);
+          doc.setFont('helvetica','bold');
+          doc.text('Estudiante:',28,yPos+24);
+          doc.setFont('helvetica','normal');
+          doc.text(email,75,yPos+24);
+
+          doc.setFont('helvetica','bold');
+          doc.text('Fecha:',28,yPos+34);
+          doc.setFont('helvetica','normal');
+          doc.text(now.toLocaleDateString('es-GT',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}),75,yPos+34);
+
+          doc.setFont('helvetica','bold');
+          doc.text('ID Transaccion:',28,yPos+44);
+          doc.setFont('helvetica','normal');
+          doc.text('GC-'+now.getTime().toString(36).toUpperCase(),85,yPos+44);
+
+          yPos+=65;
+
+          // Validity
+          doc.setFillColor(14,165,233);
+          doc.roundedRect(20,yPos,170,25,4,4,'F');
+          doc.setTextColor(255,255,255);
+          doc.setFontSize(12);
+          doc.setFont('helvetica','bold');
+          doc.text('Este certificado es valido como comprobante de canje.',105,yPos+15,{align:'center'});
+
+          // Footer
+          doc.setTextColor(148,163,184);
+          doc.setFontSize(8);
+          doc.setFont('helvetica','normal');
+          doc.text('Banco del Tiempo — Universidad Galileo — Generado automaticamente',105,285,{align:'center'});
+
+          doc.save('Galileo_Canje_'+p.name.replace(/\s+/g,'_')+'_'+now.getTime()+'.pdf');
+
+          setTimeout(function(){_origShowToast('PDF de comprobante descargado.','success');},800);
+        }catch(err){
+          console.error('PDF error:',err);
+        }
+      }
+
+      // ==============================
+      // PORTFOLIO MODULE
+      // ==============================
+      var btnToggle=document.getElementById('btnTogglePortfolioForm');
+      var formEl=document.getElementById('portfolioForm');
+      if(btnToggle&&formEl){
+        btnToggle.addEventListener('click',function(){formEl.classList.toggle('hidden');});
+      }
+
+      var btnSaveP=document.getElementById('btnSavePortfolio');
+      if(btnSaveP){
+        btnSaveP.addEventListener('click',async function(){
+          var title=(document.getElementById('portfolioTitle')||{}).value||'';
+          if(!title.trim()){_origShowToast('El titulo es obligatorio.','error');return;}
+          try{
+            var session=await sb.auth.getSession();
+            var uid=session.data.session.user.id;
+            var {error}=await sb.from('portfolio').insert({
+              user_id:uid,
+              title:title.trim(),
+              description:(document.getElementById('portfolioDesc')||{}).value||'',
+              image_url:(document.getElementById('portfolioImage')||{}).value||'',
+              project_url:(document.getElementById('portfolioUrl')||{}).value||''
+            });
+            if(error) throw error;
+            _origShowToast('Proyecto agregado al portafolio.','success');
+            if(document.getElementById('portfolioTitle')) document.getElementById('portfolioTitle').value='';
+            if(document.getElementById('portfolioDesc')) document.getElementById('portfolioDesc').value='';
+            if(document.getElementById('portfolioImage')) document.getElementById('portfolioImage').value='';
+            if(document.getElementById('portfolioUrl')) document.getElementById('portfolioUrl').value='';
+            formEl.classList.add('hidden');
+            loadPortfolio(uid);
+          }catch(e){_origShowToast('Error: '+(e.message||e),'error');}
+        });
+      }
+
+      async function loadPortfolio(uid){
+        var list=document.getElementById('portfolioList');
+        if(!list||!uid) return;
+        var {data,error}=await sb.from('portfolio').select('*').eq('user_id',uid).order('created_at',{ascending:false});
+        if(error||!data||!data.length){
+          list.innerHTML='<p style="font-size:13px;color:#475569;">Aun no has agregado proyectos a tu portafolio.</p>';
+          return;
+        }
+        list.innerHTML=data.map(function(item){
+          return '<div style="background:rgba(15,23,42,0.6);border:1px solid rgba(148,163,184,0.1);border-radius:12px;overflow:hidden;">'
+            +(item.image_url?'<img src="'+esc(item.image_url)+'" style="width:100%;height:120px;object-fit:cover;" onerror="this.style.display=\'none\'" />':'')
+            +'<div style="padding:12px;">'
+            +'<p style="font-size:14px;font-weight:600;color:#e2e8f0;margin:0;">'+esc(item.title)+'</p>'
+            +(item.description?'<p style="font-size:12px;color:#94a3b8;margin:6px 0 0 0;">'+esc(item.description)+'</p>':'')
+            +(item.project_url?'<a href="'+esc(item.project_url)+'" target="_blank" rel="noopener" style="font-size:11px;color:#38bdf8;text-decoration:none;display:inline-block;margin-top:6px;">Ver proyecto →</a>':'')
+            +'<div style="margin-top:8px;"><button onclick="deletePortfolioItem(\''+item.id+'\')" style="font-size:11px;color:#f87171;background:none;border:none;cursor:pointer;">Eliminar</button></div>'
+            +'</div></div>';
+        }).join('');
+      }
+
+      window.deletePortfolioItem=async function(id){
+        if(!confirm('¿Eliminar este proyecto?')) return;
+        try{
+          await sb.from('portfolio').delete().eq('id',id);
+          var s=await sb.auth.getSession();
+          loadPortfolio(s.data.session.user.id);
+          _origShowToast('Proyecto eliminado.','success');
+        }catch(e){_origShowToast('Error: '+(e.message||e),'error');}
+      };
+
+      // ==============================
+      // WALLET STATS (type=banco)
+      // ==============================
+      function updateWalletStats(){
+        try{
+          var bal=state.myProfile?Math.max(0,parseInt(state.myProfile.credits)||0):0;
+          var wBal=document.getElementById('walletBalance');
+          if(wBal) wBal.textContent=String(bal);
+
+          // Calculate earned/spent from history
+          var earned=0,spent=0,txCount=0;
+          var allHistory=(state.historyFromDocs||[]).concat(state.historyToDocs||[]);
+          allHistory.forEach(function(doc){
+            var d=typeof doc.data==='function'?doc.data():doc;
+            var amt=parseInt(d.amount)||0;
+            if(d.from===state.uid) spent+=amt;
+            if(d.to===state.uid) earned+=amt;
+            txCount++;
+          });
+
+          var wE=document.getElementById('walletEarned');
+          var wS=document.getElementById('walletSpent');
+          var wT=document.getElementById('walletTxCount');
+          if(wE) wE.textContent=String(earned);
+          if(wS) wS.textContent=String(spent);
+          if(wT) wT.textContent=String(txCount);
+        }catch(e){}
+      }
+
+      // ==============================
+      // LEVEL / REPUTATION SYSTEM
+      // ==============================
+      function getLevelInfo(profile){
+        var credits=parseInt(profile.credits)||0;
+        var reviews=parseInt(profile.reviews)||0;
+        var rating=parseFloat(profile.rating)||5;
+        var xp=credits*2+reviews*15+Math.floor(rating*10);
+
+        var levels=[
+          {name:'Novato',min:0,color:'#64748b',icon:'🌱'},
+          {name:'Aprendiz',min:50,color:'#38bdf8',icon:'📘'},
+          {name:'Colaborador',min:150,color:'#34d399',icon:'🤝'},
+          {name:'Experto',min:350,color:'#a78bfa',icon:'⚡'},
+          {name:'Maestro',min:700,color:'#fbbf24',icon:'👑'},
+          {name:'Leyenda',min:1500,color:'#f472b6',icon:'🏆'}
+        ];
+        var current=levels[0];
+        var next=levels[1];
+        for(var i=levels.length-1;i>=0;i--){
+          if(xp>=levels[i].min){current=levels[i];next=levels[i+1]||null;break;}
+        }
+        var progress=next?Math.min(100,Math.floor((xp-current.min)/(next.min-current.min)*100)):100;
+        return {level:current,next:next,xp:xp,progress:progress,levelIndex:levels.indexOf(current)+1,totalLevels:levels.length};
+      }
+
+      function renderLevelBadge(){
+        var el=document.getElementById('levelBadgeContent');
+        if(!el||!state.myProfile) return;
+        var info=getLevelInfo(state.myProfile);
+        el.innerHTML=''
+          +'<div style="display:flex;align-items:center;gap:12px;flex:1;min-width:200px;">'
+          +'  <div style="width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;background:rgba(15,23,42,0.8);border:2px solid '+info.level.color+';">'+info.level.icon+'</div>'
+          +'  <div>'
+          +'    <p style="font-size:16px;font-weight:700;color:'+info.level.color+';margin:0;">Nivel '+info.levelIndex+': '+info.level.name+'</p>'
+          +'    <p style="font-size:12px;color:#64748b;margin:2px 0 0 0;">'+info.xp+' XP'+(info.next?' — Siguiente: '+info.next.name+' ('+info.next.min+' XP)':' — Nivel maximo!')+'</p>'
+          +'  </div>'
+          +'</div>'
+          +'<div style="flex:1;min-width:200px;">'
+          +'  <div style="height:8px;background:rgba(148,163,184,0.15);border-radius:99px;overflow:hidden;">'
+          +'    <div style="height:100%;width:'+info.progress+'%;background:linear-gradient(90deg,'+info.level.color+',rgba(255,255,255,0.3));border-radius:99px;transition:width 0.5s ease;"></div>'
+          +'  </div>'
+          +'  <p style="font-size:11px;color:#475569;margin:4px 0 0 0;">'+info.progress+'% al siguiente nivel</p>'
+          +'</div>';
+      }
+
+      // ==============================
+      // ENHANCED SEARCH (remove GC transfer, cleaner design)
+      // ==============================
+      var origRenderSearch=window.renderSearchResults;
+      window.renderSearchResults=function(){
+        // Let original render first
+        origRenderSearch();
+
+        // Now enhance: remove transfer inputs, improve card design
+        var container=document.getElementById('searchResults');
+        if(!container) return;
+
+        // Remove all transfer input sections
+        container.querySelectorAll('[data-credit-input]').forEach(function(input){
+          var row=input.closest('.grid, div');
+          if(row&&row.querySelector('[data-action="transfer"]')) row.remove();
+        });
+
+        // Add level badges to each card
+        container.querySelectorAll('[data-user-card]').forEach(function(card){
+          var uid=card.getAttribute('data-user-id');
+          var userData=state.usersMap.get(uid);
+          if(!userData) return;
+          var info=getLevelInfo(userData);
+          var existing=card.querySelector('.level-badge-inline');
+          if(existing) return;
+          var badge=document.createElement('span');
+          badge.className='level-badge-inline';
+          badge.style.cssText='display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 8px;border-radius:99px;background:rgba(15,23,42,0.8);border:1px solid '+info.level.color+';color:'+info.level.color+';margin-top:6px;';
+          badge.textContent=info.level.icon+' Nv.'+info.levelIndex+' '+info.level.name;
+          var nameEl=card.querySelector('.min-w-0');
+          if(nameEl) nameEl.appendChild(badge);
+        });
+      };
+
+      // ==============================
+      // HOOK INTO PROFILE RENDER
+      // ==============================
+      var origRenderProfile=window.renderProfileDashboard;
+      window.renderProfileDashboard=function(){
+        origRenderProfile();
+        renderLevelBadge();
+        updateWalletStats();
+        // Load portfolio
+        try{
+          if(state.uid) loadPortfolio(state.uid);
+        }catch(e){}
+      };
+
+      // Hook into history render
+      var origRenderHistory=window.renderHistory;
+      window.renderHistory=function(){
+        origRenderHistory();
+        updateWalletStats();
+      };
+
+      // Hook into section change to refresh data
+      var origSetSection=window.setActiveSection;
+      window.setActiveSection=function(name){
+        origSetSection(name);
+        if(name==='history') updateWalletStats();
+        if(name==='dashboard'){renderLevelBadge();updateWalletStats();if(state.uid)loadPortfolio(state.uid);}
+      };
+
+      // Utility
+      function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+    }
+  })();
+  </script>
 </body>
 </html>
