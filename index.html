@@ -631,6 +631,13 @@
       margin: 20px 0;
     }
 
+    /* Desktop: sidebar always visible */
+    @media (min-width: 769px) {
+      #sidebar {
+        transform: none !important;
+      }
+    }
+
     /* ===== MOBILE RESPONSIVE ===== */
     @media (max-width: 768px) {
       #sidebar {
@@ -638,7 +645,7 @@
         top: 0; left: 0; bottom: 0;
         transform: translateX(-100%);
       }
-      #sidebar.sidebar-open {
+      #sidebar.sidebar-open, #sidebar:not(.-translate-x-full) {
         transform: translateX(0);
         box-shadow: 8px 0 40px rgba(0,0,0,0.5);
       }
@@ -1089,7 +1096,7 @@
                     <circle cx="24" cy="24" r="20" fill="rgba(14,165,233,0.12)" stroke="#0ea5e9" stroke-width="2"/>
                     <text x="24" y="29" text-anchor="middle" font-size="14" font-weight="800" fill="#38bdf8" font-family="Inter,sans-serif">GC</text>
                   </svg>
-                  <div id="sidebarCredits" style="font-size:28px;font-weight:800;color:#38bdf8;"></div>
+                  <div id="dashCreditsDisplay" style="font-size:28px;font-weight:800;color:#38bdf8;"></div>
                 </div>
                 <p style="font-size:12px;color:#475569;margin:0;">Galileo Coins disponibles para intercambios y marketplace</p>
               </div>
@@ -1099,13 +1106,13 @@
                 <div class="rating-stars" style="margin-bottom:8px;font-size:20px;">
                   <span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span>
                 </div>
-                <p id="sidebarRating" style="font-size:22px;font-weight:700;color:#34d399;margin:0 0 6px 0;">5.0</p>
+                <p id="dashRatingDisplay" style="font-size:22px;font-weight:700;color:#34d399;margin:0 0 6px 0;">5.0</p>
                 <p style="font-size:12px;color:#475569;margin:0;">Calificación promedio de la comunidad</p>
               </div>
 
               <div class="glass" style="border-radius:14px;padding:18px;">
                 <h3 style="font-size:13px;font-weight:700;color:#94a3b8;margin:0 0 10px 0;text-transform:uppercase;letter-spacing:0.7px;">Cuenta</h3>
-                <p id="sidebarEmail" style="font-size:13px;color:#64748b;margin:0;word-break:break-all;"></p>
+                <p id="dashEmailDisplay" style="font-size:13px;color:#64748b;margin:0;word-break:break-all;"></p>
               </div>
             </div>
 
