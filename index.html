@@ -1151,6 +1151,28 @@
             </div>
           </div>
 
+          <!-- RECOMMENDATIONS -->
+          <div id="recommendationsSection" class="glass" style="border-radius:16px;padding:20px;margin-top:20px;">
+            <h3 style="font-size:15px;font-weight:700;color:#e2e8f0;margin:0 0 14px 0;display:flex;align-items:center;gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.3 4.7-3.2 6H8.2C6.3 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"/><path d="M9 21h6"/><path d="M10 17h4"/></svg>
+              Recomendaciones para ti
+            </h3>
+            <div id="recommendationsList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">
+              <p style="font-size:13px;color:#475569;">Cargando recomendaciones...</p>
+            </div>
+          </div>
+
+          <!-- WEEKLY GOALS -->
+          <div id="goalsSection" class="glass" style="border-radius:16px;padding:20px;margin-top:20px;">
+            <h3 style="font-size:15px;font-weight:700;color:#e2e8f0;margin:0 0 14px 0;display:flex;align-items:center;gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              Objetivos semanales
+            </h3>
+            <div id="goalsList" style="display:flex;flex-direction:column;gap:10px;">
+              <p style="font-size:13px;color:#475569;">Cargando objetivos...</p>
+            </div>
+          </div>
+
         </section><!-- /section-dashboard -->
 
 
@@ -1215,13 +1237,13 @@
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                   <span id="serviceRoleBadge" class="service-pill" style="background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);color:#38bdf8;"></span>
                   <span id="serviceTimer" style="font-size:13px;font-weight:700;color:#f59e0b;font-variant-numeric:tabular-nums;"></span>
-                  <span id="serviceCreditsPreview" class="gc-badge" style="display:none;"></span>
+                  <span id="serviceCreditsPreview" class="gc-badge" style="font-size:12px;color:#34d399;font-weight:600;"></span>
                   <span id="serviceStateText" style="font-size:12px;color:#64748b;font-weight:500;"></span>
-                  <button id="btnStartService" onclick="startService()" class="service-action btn-success" style="font-size:12px;padding:7px 14px;display:none;">
+                  <button id="btnStartService" onclick="startService()" class="service-action btn-success" style="font-size:12px;padding:7px 14px;display:inline-flex;align-items:center;gap:5px;border-radius:10px;border:none;cursor:pointer;font-weight:600;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     Iniciar
                   </button>
-                  <button id="btnStopService" onclick="stopService()" class="service-action" style="background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2);font-size:12px;padding:7px 14px;display:none;">
+                  <button id="btnStopService" onclick="stopService()" class="service-action" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.25);font-size:12px;padding:7px 14px;display:inline-flex;align-items:center;gap:5px;border-radius:10px;cursor:pointer;font-weight:600;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
                     Detener
                   </button>
@@ -1519,6 +1541,31 @@
             </div>
 
           </div>
+          <!-- RESERVATION SYSTEM -->
+          <div class="glass" style="border-radius:16px;padding:20px;margin-top:20px;">
+            <h3 style="font-size:15px;font-weight:700;color:#e2e8f0;margin:0 0 14px 0;display:flex;align-items:center;gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+              Reservar servicio
+            </h3>
+            <p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">Selecciona un usuario y un horario para agendar un intercambio de tiempo.</p>
+            <div style="display:grid;gap:10px;max-width:500px;">
+              <select id="reserveUser" class="input-field" style="padding:10px 14px;">
+                <option value="">Seleccionar usuario...</option>
+              </select>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <input id="reserveDate" type="date" class="input-field" />
+                <input id="reserveTime" type="time" class="input-field" />
+              </div>
+              <textarea id="reserveNote" class="input-field" rows="2" maxlength="300" placeholder="Nota o descripcion del servicio (opcional)" style="resize:vertical;"></textarea>
+              <button id="btnReserve" type="button" style="padding:10px;border-radius:10px;background:#10b981;color:#fff;border:none;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                Confirmar reserva
+              </button>
+            </div>
+            <div id="reservationsList" style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+            </div>
+          </div>
+
         </section><!-- /section-services -->
 
 
@@ -2166,6 +2213,267 @@
 
       // Utility
       function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+    }
+  })();
+  </script>
+
+  <!-- FLOATING AI ASSISTANT -->
+  <div id="aiAssistant" style="position:fixed;bottom:24px;right:24px;z-index:200;">
+    <button id="btnAiToggle" type="button" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#a78bfa);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(14,165,233,0.4);display:flex;align-items:center;justify-content:center;transition:transform 0.2s ease;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.3 4.7-3.2 6H8.2C6.3 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"/><path d="M9 21h6"/><path d="M10 17h4"/></svg>
+    </button>
+    <div id="aiPanel" class="hidden" style="position:absolute;bottom:64px;right:0;width:340px;max-height:450px;background:#111827;border:1px solid rgba(148,163,184,0.12);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.5);overflow:hidden;">
+      <div style="padding:14px 16px;border-bottom:1px solid rgba(148,163,184,0.08);display:flex;align-items:center;gap:8px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#a78bfa);display:flex;align-items:center;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.3 4.7-3.2 6H8.2C6.3 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"/></svg>
+        </div>
+        <div style="flex:1;"><p style="font-size:14px;font-weight:700;color:#e2e8f0;margin:0;">Asistente Galileo</p><p style="font-size:11px;color:#64748b;margin:0;">Sugerencias personalizadas</p></div>
+      </div>
+      <div id="aiContent" style="padding:14px 16px;max-height:360px;overflow-y:auto;">
+        <p style="font-size:13px;color:#475569;">Cargando sugerencias...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- NEW FEATURES MODULE: Recommendations, Goals, Reservations, AI -->
+  <!-- ============================================================ -->
+  <script>
+  (function(){
+    if(window.__newFeaturesBooted) return;
+    window.__newFeaturesBooted=true;
+    var wait=setInterval(function(){
+      if(typeof sb==='undefined'||typeof state==='undefined') return;
+      clearInterval(wait);
+      bootNewFeatures();
+    },400);
+
+    function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+
+    function bootNewFeatures(){
+      var _toast=window.showToast;
+
+      // ==============================
+      // AI ASSISTANT TOGGLE
+      // ==============================
+      var btnAi=document.getElementById('btnAiToggle');
+      var aiPanel=document.getElementById('aiPanel');
+      if(btnAi&&aiPanel){
+        btnAi.addEventListener('click',function(){
+          aiPanel.classList.toggle('hidden');
+          if(!aiPanel.classList.contains('hidden')) renderAiSuggestions();
+        });
+      }
+
+      function renderAiSuggestions(){
+        var el=document.getElementById('aiContent');
+        if(!el) return;
+        var mySkills=(state.myProfile&&(state.myProfile.skill||state.myProfile.skills))||'';
+        var suggestions=[];
+
+        // Skill suggestions
+        var trendingSkills=['JavaScript','Python','Diseno UX','Marketing Digital','Excel Avanzado','Fotografia','Edicion de Video','Ingles Conversacional','React','Data Analysis'];
+        var mySkillsLower=mySkills.toLowerCase();
+        var newSkills=trendingSkills.filter(function(s){return mySkillsLower.indexOf(s.toLowerCase())===-1;});
+        suggestions.push({icon:'\ud83d\udca1',title:'Habilidades en tendencia',text:'Considera aprender: '+newSkills.slice(0,3).join(', ')});
+
+        // User recommendations based on complementary skills
+        var users=Array.from(state.usersMap.entries()).filter(function(e){return e[0]!==state.uid;});
+        if(users.length>0){
+          var recommended=users.filter(function(e){
+            var uSkill=(e[1].skill||e[1].skills||'').toLowerCase();
+            return uSkill&&mySkillsLower&&uSkill!==mySkillsLower;
+          }).slice(0,2);
+          if(recommended.length){
+            suggestions.push({icon:'\ud83e\udd1d',title:'Usuarios que podrian ayudarte',text:recommended.map(function(e){return esc(e[1].email||'Usuario')+' ('+esc(e[1].skill||e[1].skills||'Varias')+')';}).join('<br/>')});
+          }
+        }
+
+        // Activity tip
+        var credits=state.myProfile?parseInt(state.myProfile.credits)||0:0;
+        if(credits<5) suggestions.push({icon:'\ud83d\udcb0',title:'Consejo',text:'Compra Galileo Coins para desbloquear productos del marketplace y subir de nivel.'});
+        else suggestions.push({icon:'\u2b50',title:'Buen trabajo',text:'Tienes '+credits+' GC. Explora el marketplace o ofrece servicios para ganar mas.'});
+
+        // Tips
+        var tips=['Completa tu perfil para aparecer en busquedas.','Agrega proyectos a tu portafolio para generar confianza.','Califica a otros usuarios despues de cada servicio.','Reserva un servicio para planificar tus intercambios.'];
+        suggestions.push({icon:'\ud83c\udfaf',title:'Tip del dia',text:tips[Math.floor(Math.random()*tips.length)]});
+
+        el.innerHTML=suggestions.map(function(s){
+          return '<div style="padding:10px 12px;background:rgba(15,23,42,0.6);border:1px solid rgba(148,163,184,0.08);border-radius:10px;margin-bottom:8px;">'
+            +'<p style="font-size:13px;font-weight:600;color:#e2e8f0;margin:0;">'+s.icon+' '+s.title+'</p>'
+            +'<p style="font-size:12px;color:#94a3b8;margin:4px 0 0 0;line-height:1.5;">'+s.text+'</p>'
+            +'</div>';
+        }).join('');
+      }
+
+      // ==============================
+      // RECOMMENDATIONS (dashboard)
+      // ==============================
+      function renderRecommendations(){
+        var el=document.getElementById('recommendationsList');
+        if(!el) return;
+        var mySkills=(state.myProfile&&(state.myProfile.skill||state.myProfile.skills)||'').toLowerCase();
+        var users=Array.from(state.usersMap.entries()).filter(function(e){return e[0]!==state.uid;}).map(function(e){return{uid:e[0],data:e[1]};});
+
+        // Find users with different skills (complementary)
+        var complementary=users.filter(function(u){
+          var s=(u.data.skill||u.data.skills||'').toLowerCase();
+          return s&&s!==mySkills;
+        }).slice(0,4);
+
+        // Find users with similar skills
+        var similar=users.filter(function(u){
+          var s=(u.data.skill||u.data.skills||'').toLowerCase();
+          return s&&mySkills&&s.indexOf(mySkills.split(',')[0].trim())!==-1;
+        }).slice(0,2);
+
+        var all=complementary.concat(similar);
+        var seen={};
+        all=all.filter(function(u){if(seen[u.uid])return false;seen[u.uid]=true;return true;});
+
+        if(!all.length){
+          el.innerHTML='<p style="font-size:13px;color:#475569;">Completa tu perfil con habilidades para recibir recomendaciones personalizadas.</p>';
+          return;
+        }
+
+        el.innerHTML=all.map(function(u){
+          var d=u.data;
+          var photo=d.photo||d.foto_url||'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+          var skill=esc(d.skill||d.skills||'Sin habilidades');
+          var email=esc(d.email||'Usuario');
+          var rating=parseFloat(d.rating)||5;
+          return '<div style="background:rgba(15,23,42,0.6);border:1px solid rgba(148,163,184,0.08);border-radius:12px;padding:14px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor=\'rgba(14,165,233,0.3)\'" onmouseout="this.style.borderColor=\'rgba(148,163,184,0.08)\'" onclick="if(window.setActiveSection){window.setActiveSection(\'search\');};">'
+            +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
+            +'<img src="'+esc(photo)+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid rgba(148,163,184,0.15);" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/149/149071.png\'" />'
+            +'<div style="min-width:0;"><p style="font-size:13px;font-weight:600;color:#e2e8f0;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+email+'</p>'
+            +'<p style="font-size:11px;color:#64748b;margin:0;">\u2b50 '+rating.toFixed(1)+'</p></div></div>'
+            +'<p style="font-size:12px;color:#94a3b8;margin:0;">'+skill+'</p>'
+            +'</div>';
+        }).join('');
+      }
+
+      // ==============================
+      // WEEKLY GOALS
+      // ==============================
+      function renderGoals(){
+        var el=document.getElementById('goalsList');
+        if(!el) return;
+        var credits=state.myProfile?parseInt(state.myProfile.credits)||0:0;
+        var reviews=state.myProfile?parseInt(state.myProfile.reviews)||0:0;
+        var hasSkills=!!(state.myProfile&&(state.myProfile.skill||state.myProfile.skills));
+        var hasPhoto=!!(state.myProfile&&(state.myProfile.photo||state.myProfile.foto_url));
+
+        var goals=[
+          {text:'Gana 10 Galileo Coins esta semana',progress:Math.min(100,credits*10),done:credits>=10,icon:'\ud83d\udcb0'},
+          {text:'Completa tu perfil con habilidades',progress:hasSkills?100:0,done:hasSkills,icon:'\ud83d\udcdd'},
+          {text:'Sube una foto de perfil',progress:hasPhoto?100:0,done:hasPhoto,icon:'\ud83d\udcf8'},
+          {text:'Recibe tu primera resena',progress:reviews>0?100:0,done:reviews>0,icon:'\u2b50'},
+          {text:'Haz tu primera compra en el marketplace',progress:credits>0?50:0,done:false,icon:'\ud83d\udecd\ufe0f'}
+        ];
+
+        el.innerHTML=goals.map(function(g){
+          var barColor=g.done?'#10b981':'#0ea5e9';
+          return '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.08);border-radius:10px;">'
+            +'<span style="font-size:20px;flex-shrink:0;">'+g.icon+'</span>'
+            +'<div style="flex:1;min-width:0;">'
+            +'<p style="font-size:13px;font-weight:500;color:'+(g.done?'#34d399':'#e2e8f0')+';margin:0;'+(g.done?'text-decoration:line-through;opacity:0.7;':'')+'">'+esc(g.text)+'</p>'
+            +'<div style="margin-top:6px;height:5px;background:rgba(148,163,184,0.12);border-radius:99px;overflow:hidden;">'
+            +'<div style="height:100%;width:'+g.progress+'%;background:'+barColor+';border-radius:99px;transition:width 0.4s ease;"></div>'
+            +'</div></div>'
+            +(g.done?'<span style="color:#34d399;font-size:16px;">\u2713</span>':'')
+            +'</div>';
+        }).join('');
+      }
+
+      // ==============================
+      // RESERVATIONS
+      // ==============================
+      function populateReserveUsers(){
+        var sel=document.getElementById('reserveUser');
+        if(!sel) return;
+        var users=Array.from(state.usersMap.entries()).filter(function(e){return e[0]!==state.uid;});
+        sel.innerHTML='<option value="">Seleccionar usuario...</option>'+users.map(function(e){
+          return '<option value="'+esc(e[0])+'">'+esc(e[1].email||'Usuario')+'</option>';
+        }).join('');
+      }
+
+      var btnReserve=document.getElementById('btnReserve');
+      if(btnReserve){
+        btnReserve.addEventListener('click',async function(){
+          var userId=document.getElementById('reserveUser')?.value;
+          var date=document.getElementById('reserveDate')?.value;
+          var time=document.getElementById('reserveTime')?.value;
+          var note=document.getElementById('reserveNote')?.value||'';
+          if(!userId||!date||!time){_toast('Completa usuario, fecha y hora.','error');return;}
+          try{
+            var session=await sb.auth.getSession();
+            var uid=session.data.session.user.id;
+            // Save as a notification to the target user
+            await sb.from('notifications').insert({
+              id:crypto.randomUUID(),
+              user_id:userId,
+              text:'Reserva de servicio el '+date+' a las '+time+(note?' - '+note:''),
+              type:'reservation',
+              read:false,
+              timestamp:Date.now()
+            });
+            // Also notify self
+            await sb.from('notifications').insert({
+              id:crypto.randomUUID(),
+              user_id:uid,
+              text:'Reservaste servicio con '+(state.usersMap.get(userId)?.email||'usuario')+' el '+date+' a las '+time,
+              type:'reservation_sent',
+              read:false,
+              timestamp:Date.now()
+            });
+            _toast('Reserva confirmada. Se notificara al usuario.','success');
+            document.getElementById('reserveDate').value='';
+            document.getElementById('reserveTime').value='';
+            document.getElementById('reserveNote').value='';
+            loadReservations();
+          }catch(e){_toast('Error: '+(e.message||e),'error');}
+        });
+      }
+
+      async function loadReservations(){
+        var el=document.getElementById('reservationsList');
+        if(!el||!state.uid) return;
+        var {data}=await sb.from('notifications').select('*').eq('user_id',state.uid).in('type',['reservation','reservation_sent']).order('timestamp',{ascending:false}).limit(10);
+        if(!data||!data.length){el.innerHTML='';return;}
+        el.innerHTML='<p style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 8px 0;">Mis reservas recientes</p>'
+          +data.map(function(r){
+            var isSent=r.type==='reservation_sent';
+            return '<div style="padding:10px 14px;background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.08);border-radius:10px;display:flex;align-items:center;gap:10px;">'
+              +'<span style="font-size:16px;">'+(isSent?'\ud83d\udce4':'\ud83d\udce5')+'</span>'
+              +'<div style="flex:1;min-width:0;">'
+              +'<p style="font-size:12px;color:#e2e8f0;margin:0;">'+esc(r.text)+'</p>'
+              +'<p style="font-size:11px;color:#475569;margin:2px 0 0 0;">'+new Date(r.timestamp).toLocaleString('es-GT')+'</p>'
+              +'</div></div>';
+          }).join('');
+      }
+
+      // ==============================
+      // HOOKS
+      // ==============================
+      var _origProfile=window.renderProfileDashboard;
+      window.renderProfileDashboard=function(){
+        _origProfile();
+        renderRecommendations();
+        renderGoals();
+      };
+
+      var _origSetSection=window.setActiveSection;
+      window.setActiveSection=function(name){
+        _origSetSection(name);
+        if(name==='dashboard'){renderRecommendations();renderGoals();}
+        if(name==='services'){populateReserveUsers();loadReservations();}
+      };
+
+      // Initial render if already on dashboard
+      setTimeout(function(){
+        if(state.myProfile){renderRecommendations();renderGoals();}
+        populateReserveUsers();
+      },2000);
     }
   })();
   </script>
