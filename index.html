@@ -1657,20 +1657,28 @@
         if(!state.uid||!state.activeChatUserId||!state.activeChatId){
           showToast('Selecciona un chat con servicio activo.','error');return;
         }
-        var serviceRef=db.collection('services').doc(state.activeChatId);
-        var clientRef=db.collection('users').doc(state.uid);
-        var providerRef=db.collection('users').doc(state.activeChatUserId);
-        var historyRef=db.collection('history').doc();
         try{
           setLoading(true,'Deteniendo servicio...');
+          // Read service doc directly via Supabase (bypass adapter caching)
+          var chatId=state.activeChatId;
+          var {data:svcRow,error:svcErr}=await sb.from('services').select('*').eq('id',chatId).limit(1);
+          if(svcErr) throw new Error(svcErr.message);
+          var sd=(svcRow&&svcRow[0])||null;
+          if(!sd) throw new Error('No existe un servicio activo para este chat.');
+          if(sd.clientId!==state.uid) throw new Error('Solo el cliente que inicio el servicio puede detenerlo.');
+          if(sd.status!=='active') throw new Error('Este servicio ya fue finalizado.');
+
+          var endTime=Date.now();
+          var duration=Math.max(0,endTime-Math.max(0,parseInt(sd.startTime)||0));
+          var creditsGiven=Math.floor(Math.floor(duration/60000)/30);
+
+          // Read client and provider profiles
+          var clientRef=db.collection('users').doc(state.uid);
+          var providerRef=db.collection('users').doc(state.activeChatUserId);
+          var serviceRef=db.collection('services').doc(chatId);
+          var historyRef=db.collection('history').doc();
+
           await db.runTransaction(async function(tx){
-            var snap=await tx.get(serviceRef);
-            if(!snap.exists) throw new Error('No existe un servicio activo para este chat.');
-            var sd=snap.data()||{};
-            if(safeString(sd.clientId,'')!==state.uid) throw new Error('Solo el cliente que inicio el servicio puede detenerlo.');
-            if(safeString(sd.status,'')!=='active') throw new Error('Este servicio ya fue finalizado.');
-            var endTime=Date.now(),duration=Math.max(0,endTime-Math.max(0,safeInt(sd.startTime,0)));
-            var creditsGiven=Math.floor(Math.floor(duration/60000)/30);
             var cSnap=await tx.get(clientRef),pSnap=await tx.get(providerRef);
             if(!cSnap.exists||!pSnap.exists) throw new Error('No se pudieron cargar los perfiles.');
             var c=normalizeUserDoc(cSnap.data(),state.authUser),p=normalizeUserDoc(pSnap.data(),null);
@@ -1678,10 +1686,10 @@
             tx.update(clientRef,{credits:c.credits-creditsGiven});
             tx.update(providerRef,{credits:p.credits+creditsGiven});
             tx.update(serviceRef,{endTime:endTime,duration:duration,creditsGiven:creditsGiven,status:'completed'});
-            tx.set(historyRef,{from:safeString(sd.clientId,''),to:safeString(sd.providerId,''),amount:creditsGiven,credits:creditsGiven,duration:duration,time:endTime,timestamp:endTime});
+            tx.set(historyRef,{from:sd.clientId,to:sd.providerId,amount:creditsGiven,credits:creditsGiven,duration:duration,time:endTime,timestamp:endTime});
           });
           showToast('Servicio finalizado y Galileo Coins transferidos correctamente.','success');
-        }catch(e){showToast(parseFirebaseError(e),'error');}finally{setLoading(false);}
+        }catch(e){showToast(typeof parseFirebaseError==='function'?parseFirebaseError(e):(e.message||String(e)),'error');}finally{setLoading(false);}
       };
     },200);
   })();
