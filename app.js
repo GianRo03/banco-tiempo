@@ -1411,7 +1411,7 @@
         + "    <p class=\"text-sm\"><span class=\"text-slate-400\">Habilidades:</span> " + escapeHtml(p.skill) + "</p>"
         + "    <p class=\"text-sm\"><span class=\"text-slate-400\">Disponibilidad:</span> " + escapeHtml(p.hours) + "</p>"
         + "    <div class=\"flex flex-wrap gap-2 pt-1\">"
-        + "      <span class=\"rounded-full bg-emerald-600/20 text-emerald-200 border border-emerald-500/30 px-3 py-1 text-xs\">Creditos: " + escapeHtml(String(p.credits)) + "</span>"
+        + "      <span class=\"rounded-full bg-emerald-600/20 text-emerald-200 border border-emerald-500/30 px-3 py-1 text-xs\">Galileo Coins: " + escapeHtml(String(p.credits)) + "</span>"
         + "      <span class=\"rounded-full bg-amber-600/20 text-amber-200 border border-amber-500/30 px-3 py-1 text-xs\">Rating: " + escapeHtml(formatRating(p.rating)) + " (" + escapeHtml(String(p.reviews)) + " reviews)</span>"
         + "    </div>"
         + "  </div>"
@@ -1615,7 +1615,7 @@
             + "        min=\"1\""
             + "        step=\"1\""
             + "        class=\"rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500\""
-            + "        placeholder=\"Creditos a transferir\""
+            + "        placeholder=\"Galileo Coins a transferir\""
             + "      />"
             + "      <button data-action=\"transfer\" class=\"rounded-xl bg-emerald-600 hover:bg-emerald-500 transition px-3 py-2 text-sm font-medium\">Enviar</button>"
             + "    </div>"
@@ -1689,11 +1689,11 @@
     async function transferCredits(toUid, amount) {
       // Validaciones de entrada.
       if (!state.uid) {
-        showToast("Debes iniciar sesion para transferir creditos.", "error");
+        showToast("Debes iniciar sesion para transferir Galileo Coins.", "error");
         return;
       }
       if (toUid === state.uid) {
-        showToast("No puedes transferirte creditos a ti mismo.", "error");
+        showToast("No puedes transferirte Galileo Coins a ti mismo.", "error");
         return;
       }
       if (!Number.isInteger(amount) || amount <= 0) {
@@ -1706,7 +1706,7 @@
       var historyRef = db.collection("history").doc();
 
       try {
-        setLoading(true, "Transfiriendo creditos...");
+        setLoading(true, "Transfiriendo Galileo Coins...");
 
         await db.runTransaction(async function (tx) {
           // Leer saldo del emisor.
@@ -1743,7 +1743,7 @@
           });
         });
 
-        showToast("Transferencia realizada correctamente.", "success");
+        showToast("Transferencia de Galileo Coins realizada correctamente.", "success");
       } catch (error) {
         showToast(parseFirebaseError(error), "error");
       } finally {
@@ -1814,7 +1814,7 @@
       if (unique.length === 0) {
         ui.historyList.innerHTML = ""
           + "<div class=\"glass rounded-xl p-4 border border-slate-700/35 text-slate-300\">"
-          + "Aun no tienes movimientos de creditos."
+          + "Aun no tienes movimientos de Galileo Coins."
           + "</div>";
         return;
       }
@@ -1837,7 +1837,7 @@
             + "      " + (isSent ? "Para" : "De") + ": " + escapeHtml(otherEmail)
             + "    </span>"
             + "  </div>"
-            + "  <p class=\"mt-2 font-semibold\">Creditos: " + escapeHtml(String(item.amount)) + "</p>"
+            + "  <p class=\"mt-2 font-semibold\">Galileo Coins: " + escapeHtml(String(item.amount)) + "</p>"
             + "  <p class=\"text-xs text-slate-400 mt-1\">Fecha: " + escapeHtml(formatDateTime(item.time)) + "</p>"
             + "</div>";
         })
@@ -2004,7 +2004,7 @@
 
           // Evitamos creditos negativos cuando el servicio ya genero consumo.
           if (creditsGiven > 0 && client.credits < creditsGiven) {
-            throw new Error("El cliente no tiene creditos suficientes para cerrar este servicio.");
+            throw new Error("El cliente no tiene Galileo Coins suficientes para cerrar este servicio.");
           }
 
           // Ajuste atomico de creditos para cliente y proveedor.
@@ -2036,7 +2036,7 @@
           });
         });
 
-        showToast("Servicio finalizado y creditos transferidos correctamente.", "success");
+        showToast("Servicio finalizado y Galileo Coins transferidos correctamente.", "success");
       } catch (error) {
         showToast(parseFirebaseError(error), "error");
       } finally {
@@ -2588,7 +2588,7 @@
         + "        <p class=\"mt-2 text-xl font-semibold text-amber-300\">" + escapeHtml(formatRating(p.rating)) + " / 5</p>"
         + "      </div>"
         + "      <div class=\"rounded-2xl border border-slate-700/40 bg-slate-900/60 p-4\">"
-        + "        <p class=\"text-xs uppercase tracking-wider text-slate-400\">Creditos</p>"
+        + "        <p class=\"text-xs uppercase tracking-wider text-slate-400\">Galileo Coins</p>"
         + "        <p class=\"mt-2 text-xl font-semibold text-emerald-300\">" + escapeHtml(String(p.credits)) + "</p>"
         + "      </div>"
         + "      <div class=\"rounded-2xl border border-slate-700/40 bg-slate-900/60 p-4\">"
@@ -2658,7 +2658,7 @@
           + "  </div>"
           + "  <div class=\"mt-4 grid sm:grid-cols-2 gap-3\">"
           + "    <div class=\"rounded-xl bg-slate-900/60 border border-slate-700/40 p-3\">"
-          + "      <p class=\"text-[11px] uppercase tracking-wider text-slate-400\">Creditos</p>"
+          + "      <p class=\"text-[11px] uppercase tracking-wider text-slate-400\">Galileo Coins</p>"
           + "      <p class=\"mt-1 font-semibold text-emerald-300\">" + escapeHtml(String(Math.max(0, safeInt(item.credits, item.amount)))) + "</p>"
           + "    </div>"
           + "    <div class=\"rounded-xl bg-slate-900/60 border border-slate-700/40 p-3\">"
@@ -3205,7 +3205,7 @@
           dashboard: "Panel principal",
           search: "Red profesional",
           chat: "Mensajeria privada",
-          buyCredits: "Comprar creditos",
+          buyCredits: "Comprar Galileo Coins",
           marketplace: "Marketplace",
           history: "Historial",
           notifications: "Notificaciones",
@@ -3320,7 +3320,7 @@
           type: safeString(base.type, "exchange"),
           direction: safeString(base.direction, "in"),
           amount: Math.max(0, safeInt(base.amount, 0)),
-          text: safeString(base.text, "Movimiento de creditos"),
+          text: safeString(base.text, "Movimiento de Galileo Coins"),
           timestamp: Math.max(0, safeInt(base.timestamp, 0)),
           counterpartyUid: safeString(base.counterpartyUid, ""),
           sourceHistoryId: safeString(base.sourceHistoryId, "")
@@ -3377,7 +3377,7 @@
             + "  </div>"
             + "  <div class=\"mt-3 flex flex-wrap items-center justify-between gap-3\">"
             + "    <p class=\"text-xs text-slate-400\">" + escapeHtml(formatDateTime(item.timestamp)) + "</p>"
-            + "    <p class=\"text-lg font-semibold " + amountColor + "\">" + escapeHtml((incoming ? "+" : "-") + String(item.amount)) + " creditos</p>"
+            + "    <p class=\"text-lg font-semibold " + amountColor + "\">" + escapeHtml((incoming ? "+" : "-") + String(item.amount)) + " GC</p>"
             + "  </div>"
             + "</article>";
         }).join("");
@@ -3398,7 +3398,7 @@
             + "  <h3 class=\"mt-2 text-lg font-semibold\">" + escapeHtml(item.name) + "</h3>"
             + "  <p class=\"mt-2 text-sm text-slate-300\">" + escapeHtml(item.description) + "</p>"
             + "  <div class=\"mt-4 flex items-center justify-between gap-2\">"
-            + "    <span class=\"rounded-full border border-amber-500/35 bg-amber-500/10 px-3 py-1 text-sm text-amber-200\">" + escapeHtml(String(item.credits)) + " creditos</span>"
+            + "    <span class=\"rounded-full border border-amber-500/35 bg-amber-500/10 px-3 py-1 text-sm text-amber-200\">" + escapeHtml(String(item.credits)) + " GC</span>"
             + "    <button type=\"button\" data-market-item=\"" + escapeAttr(item.id) + "\" class=\"rounded-xl px-3 py-2 text-sm font-medium transition " + (canRedeem ? "bg-sky-600 hover:bg-sky-500" : "bg-slate-700 text-slate-300 cursor-not-allowed") + "\" " + (canRedeem ? "" : "disabled") + ">Canjear</button>"
             + "  </div>"
             + "</article>";
@@ -3533,7 +3533,7 @@
 
       async function buyCredits(amount) {
         if (!state.uid) {
-          showToast("Debes iniciar sesion para comprar creditos.", "error");
+          showToast("Debes iniciar sesion para comprar Galileo Coins.", "error");
           return;
         }
 
@@ -3549,11 +3549,11 @@
         var notificationRef = userRef.collection("notifications").doc();
 
         try {
-          setLoading(true, "Procesando compra simulada...");
+          setLoading(true, "Procesando compra de Galileo Coins...");
           await db.runTransaction(async function (tx) {
             var userSnap = await tx.get(userRef);
             if (!userSnap.exists) {
-              throw new Error("No existe perfil para recargar creditos.");
+              throw new Error("No existe perfil para recargar Galileo Coins.");
             }
             var userData = normalizeUserDoc(userSnap.data(), state.authUser);
             var nextBalance = userData.credits + creditsAmount;
@@ -3565,11 +3565,11 @@
               type: "credit_purchase",
               direction: "in",
               amount: creditsAmount,
-              text: "Compra simulada de creditos",
+              text: "Compra simulada de Galileo Coins",
               timestamp: now
             });
             tx.set(notificationRef, {
-              text: "Compra realizada: +" + String(creditsAmount) + " creditos.",
+              text: "Compra realizada: +" + String(creditsAmount) + " Galileo Coins.",
               type: "credit_purchase",
               read: false,
               timestamp: now
@@ -3603,7 +3603,7 @@
         var notificationRef = userRef.collection("notifications").doc();
 
         try {
-          setLoading(true, "Canjeando producto...");
+          setLoading(true, "Canjeando con Galileo Coins...");
           await db.runTransaction(async function (tx) {
             var userSnap = await tx.get(userRef);
             if (!userSnap.exists) {
@@ -3612,7 +3612,7 @@
 
             var userData = normalizeUserDoc(userSnap.data(), state.authUser);
             if (userData.credits < product.credits) {
-              throw new Error("No tienes creditos suficientes para este canje.");
+              throw new Error("No tienes Galileo Coins suficientes para este canje.");
             }
 
             var nextBalance = userData.credits - product.credits;
@@ -3691,7 +3691,7 @@
 
             if (incoming) {
               await addNotificationForUser(state.uid, {
-                text: "Recibiste " + String(creditsAmount) + " creditos.",
+                text: "Recibiste " + String(creditsAmount) + " Galileo Coins.",
                 type: "credits_received",
                 read: false,
                 timestamp: txTime
